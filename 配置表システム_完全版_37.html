@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>配置表システム｜国際連邦警備保障</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --wb:#f7f6f2; --wbl:#e8e4da; --ink:#1c1c1e; --ink2:#48484a; --ink3:#8e8e93;
+  --blue:#0071e3; --blue-lt:#e8f1fb; --green:#28a745; --green-lt:#e8f5e9;
+  --red:#dc3545; --red-lt:#fce8ea; --orange:#fd7e14; --yellow:#ffc107;
+  --purple:#6f42c1; --teal:#20c997; --gray:#f2f2f7;
+  --shadow:0 2px 8px rgba(0,0,0,.08); --shadowl:0 8px 30px rgba(0,0,0,.12);
+  /* シフト色 */
+  --day-bg:#fff9e6; --day-border:#f0c040; --day-label:#b8860b;
+  --night-bg:#eef2ff; --night-border:#7c9ee8; --night-label:#3452a4;
+  --other-bg:#f5f5f5; --other-border:#aaa; --other-label:#555;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--gray);color:var(--ink);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* HEADER */
+.hd{background:#fff;border-bottom:1px solid #e0e0e0;padding:0 20px;height:60px;display:flex;align-items:center;gap:14px;flex-shrink:0;box-shadow:var(--shadow);z-index:100}
+.hd-logo{font-size:16px;font-weight:900;letter-spacing:-.02em;white-space:nowrap}
+.hd-logo span{color:var(--blue)}
+.mnav{display:flex;align-items:center;gap:8px;margin-left:10px}
+.mnav button{background:var(--gray);border:none;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.mnav button:hover{background:#e0e0e0}
+.mdisp{font-size:20px;font-weight:700;min-width:120px;text-align:center}
+.hd-acts{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{border:none;border-radius:8px;padding:8px 16px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap}
+.btn-p{background:var(--blue);color:#fff}.btn-p:hover{background:#0062c4}
+.btn-g{background:var(--green);color:#fff}.btn-g:hover{background:#218838}
+.btn-s{background:var(--gray);color:var(--ink)}.btn-s:hover{background:#e0e0e0}
+.btn-r{background:var(--red);color:#fff}.btn-r:hover{background:#c0392b}
+.btn-o{background:var(--orange);color:#fff}
+
+/* MAIN */
+.main{flex:1;display:flex;overflow:hidden}
+
+/* LEFT SIDEBAR */
+.sb{width:240px;background:#fff;border-right:1px solid #e0e0e0;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sb-top{padding:10px 14px;border-bottom:1px solid #eee;display:flex;flex-direction:column;gap:7px;flex-shrink:0}
+.sb-search{border:1px solid #ddd;border-radius:8px;padding:7px 12px;font-family:inherit;font-size:12px;outline:none;width:100%}
+.sb-search:focus{border-color:var(--blue)}
+.sb-filter{display:flex;gap:5px}
+.fchip{border:1px solid #ddd;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;background:#fff;font-family:inherit;transition:.15s}
+.fchip.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.sb-sec{padding:7px 14px 4px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);flex-shrink:0}
+.staff-list{flex:1;overflow-y:auto;padding:5px 8px}
+.sc{background:var(--gray);border:2px solid transparent;border-radius:10px;padding:8px 10px;margin-bottom:4px;cursor:grab;transition:.15s;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;user-select:none}
+.sc:hover{background:var(--blue-lt);border-color:var(--blue);transform:translateX(2px)}
+.sc.dragging{opacity:.4;cursor:grabbing}
+.sc.on-leave{background:#fff3cd;border-color:var(--yellow);cursor:not-allowed}
+.sc.not-drag{cursor:not-allowed;opacity:.6}
+.av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.si{flex:1;min-width:0}
+.sn{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sq{font-size:10px;color:var(--ink3)}
+.sd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.d-ok{background:var(--green)}.d-busy{background:var(--blue)}.d-off{background:var(--red)}
+
+/* WHITEBOARD */
+.wb-wrap{flex:1;overflow:auto;padding:12px}
+.wb{background:var(--wb);border-radius:12px;overflow:hidden;box-shadow:var(--shadowl);min-width:700px}
+.cal-hd{display:grid;background:var(--ink);color:#fff;font-size:11px;font-weight:700;position:sticky;top:0;z-index:10}
+.ch{padding:10px 3px;text-align:center;border-right:1px solid rgba(255,255,255,.1)}
+.ch.sun{background:rgba(220,53,69,.45)}.ch.sat{background:rgba(0,113,227,.35)}.ch.tod{background:var(--blue)}
+.cd{font-size:16px;font-weight:900}
+.cday{font-size:10px;opacity:.75;margin-top:2px}
+.site-row{display:grid;border-bottom:2px solid #fff}
+.sl{background:#fff;padding:6px 8px;display:flex;flex-direction:column;justify-content:center;border-right:2px solid var(--wbl);position:sticky;left:0;z-index:5;box-shadow:2px 0 4px rgba(0,0,0,.05);min-width:0}
+.sl-inner{display:flex;align-items:center;gap:6px}
+.sl-handle{color:#ccc;font-size:14px;cursor:grab;flex-shrink:0;padding:2px 0;transition:color .15s;line-height:1}
+.sl-handle:hover{color:var(--ink3)}
+.sl-btn{background:none;border:none;cursor:pointer;padding:2px 4px;border-radius:4px;font-size:13px;line-height:1;opacity:0;transition:opacity .15s}
+.sl:hover .sl-btn{opacity:1}
+.sl-edit:hover{background:var(--blue-lt)}
+.sl-del:hover{background:var(--red-lt)}
+/* シフトバッジ */
+.shift-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;border-radius:4px;padding:2px 7px;letter-spacing:.05em}
+/* 契約タイプバッジ */
+.contract-badge{display:inline-flex;align-items:center;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;border:1px solid;white-space:nowrap}
+.contract-permanent{background:#e8f5e9;color:#1b5e20;border-color:#4caf50}  /* 常駐：緑 */
+.contract-regular   {background:#e3f2fd;color:#0d47a1;border-color:#42a5f5}  /* 定期：青 */
+.contract-spot      {background:#fff3e0;color:#e65100;border-color:#ffa726}  /* スポット：オレンジ */
+.contract-term      {background:#f3e5f5;color:#6a1b9a;border-color:#ab47bc}  /* 期限付き：紫 */
+/* 期限切れ警告 */
+.site-row.expired .sl{background:#fce8ea;border-left-color:var(--red) !important}
+.expiry-warn{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;color:#c0392b;background:#fce8ea;border:1px solid #e74c3c;border-radius:3px;padding:1px 5px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.ch.hol{background:rgba(220,53,69,.45)}   /* 祝日ヘッダー：赤（日曜と同色） */
+.dc.hol{background:rgba(220,53,69,.05)}   /* 祝日セル */
+.hol-mark{font-size:8px;color:#e74c3c;font-weight:700;line-height:1;margin-top:1px}
+.dc.inactive{background:repeating-linear-gradient(135deg,rgba(0,0,0,.03),rgba(0,0,0,.03) 3px,transparent 3px,transparent 8px) !important;opacity:.55;pointer-events:none}
+.dc.inactive.sun{background:repeating-linear-gradient(135deg,rgba(220,53,69,.07),rgba(220,53,69,.07) 3px,transparent 3px,transparent 8px) !important}
+/* メモ */
+.memo-chip{background:#fff9c4;border:1px solid #f9e04b;border-radius:3px;padding:2px 5px;font-size:9px;color:#7a6000;line-height:1.3;word-break:break-all;cursor:pointer;margin-top:2px;display:flex;align-items:flex-start;gap:3px}
+.memo-chip:hover{background:#fff59d}
+.memo-icon{flex-shrink:0;font-size:10px;margin-top:-1px}
+.memo-add-btn{background:none;border:1px dashed #ccc;border-radius:3px;font-size:9px;color:#aaa;cursor:pointer;padding:1px 5px;font-family:inherit;width:100%;text-align:center;transition:.15s;margin-top:2px;opacity:0}
+.dc:hover .memo-add-btn{opacity:1}
+.dc .memo-add-btn:hover{border-color:#f9e04b;color:#b8a000;background:#fffde7}
+/* 隊員カードのインラインメモ */
+.staff-memo-btn{background:none;border:none;cursor:pointer;font-size:11px;padding:0 2px;opacity:0;transition:.15s;line-height:1;flex-shrink:0}
+.asgn:hover .staff-memo-btn{opacity:1}
+.staff-memo-area{margin-top:3px}
+.staff-memo-input{background:#fffde7;border:1px solid #f9e04b;border-radius:3px;padding:3px 5px;font-size:10px;color:#5a4500;line-height:1.4;min-height:28px;word-break:break-all;outline:none;cursor:text;font-family:inherit}
+.staff-memo-input:empty::before{content:attr(data-placeholder);color:#bfa040;pointer-events:none}
+.staff-memo-input:focus{border-color:#f0b000;background:#fffff0}
+.dc.cancelled{background:rgba(220,53,69,.08) !important;outline:2px solid rgba(220,53,69,.35);outline-offset:-2px}
+.cancel-banner{font-size:10px;font-weight:900;color:#c0392b;background:#fce8ea;border:1px solid #e74c3c;border-radius:4px;padding:2px 6px;text-align:center;margin-bottom:3px;letter-spacing:.05em}
+.cancel-btn{background:none;border:1.5px solid #e74c3c;border-radius:4px;color:#c0392b;font-size:9px;font-weight:700;cursor:pointer;padding:1px 5px;font-family:inherit;transition:.15s;white-space:nowrap}
+.cancel-btn:hover{background:#fce8ea}
+.cancel-btn.undo{border-color:#aaa;color:#888}
+.cancel-btn.undo:hover{background:#f5f5f5}
+.asgn.staff-cancelled{opacity:.55;background:rgba(220,53,69,.08) !important;border-color:rgba(220,53,69,.3) !important}
+.asgn.staff-cancelled .asgn-name{text-decoration:line-through;color:#c0392b !important}
+.asgn.staff-cancelled{opacity:.6;background:rgba(220,53,69,.08) !important;border-color:rgba(220,53,69,.3) !important}
+.site-row.collapsed .sl{background:#f9f9f9}
+.site-row.collapsed .dc,.site-row.collapsed .cc{display:none}
+.site-row.collapsed{border-bottom:1px solid #eee}
+.collapse-btn{background:none;border:none;cursor:pointer;font-size:13px;padding:2px 3px;border-radius:4px;color:var(--ink3);transition:all .15s;line-height:1;flex-shrink:0}
+.collapse-btn:hover{background:var(--gray);color:var(--ink)}
+.guard-badge{display:inline-flex;align-items:center;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;border:1px solid;white-space:nowrap}
+.guard-1{background:#fff8e1;color:#b8860b;border-color:#f0c040}
+.guard-2{background:#e8f5e9;color:#2e7d32;border-color:#66bb6a}
+.guard-3{background:#e3f2fd;color:#1565c0;border-color:#64b5f6}
+.guard-4{background:#fce4ec;color:#880e4f;border-color:#f48fb1}
+.qual-badge{display:inline-flex;align-items:center;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;border:1px solid;white-space:nowrap}
+.qual-general  {background:#f5f5f5;color:#666;border-color:#bbb}
+.qual-qualified{background:#ede7f6;color:#4527a0;border-color:#9575cd}
+.qual-certified{background:#e0f7fa;color:#006064;border-color:#4dd0e1}
+.day-btn{width:36px;height:36px;border-radius:50%;border:2px solid #ddd;background:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;color:var(--ink2)}
+.day-btn:hover{border-color:var(--blue);color:var(--blue)}
+.day-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.day-btn.sun{--active-bg:#dc3545;--active-border:#c0392b}
+.day-btn.active.sun{background:#dc3545;border-color:#c0392b}
+.day-btn.sat.active{background:#0071e3;border-color:#0062c4}
+.shift-day  {background:var(--day-bg);  color:var(--day-label);  border:1px solid var(--day-border)}
+.shift-night{background:var(--night-bg);color:var(--night-label);border:1px solid var(--night-border)}
+.shift-other{background:var(--other-bg);color:var(--other-label);border:1px solid var(--other-border)}
+/* サイト行の左ボーダーアクセント */
+.site-row.s-day   .sl{border-left:4px solid var(--day-border)}
+.site-row.s-night .sl{border-left:4px solid var(--night-border)}
+.site-row.s-other .sl{border-left:4px solid var(--other-border)}
+/* セルの薄い背景 */
+.site-row.s-day   .dc:not(.sun):not(.sat):not(.tod){background:rgba(255,200,0,.04)}
+.site-row.s-night .dc:not(.sun):not(.sat):not(.tod){background:rgba(100,130,220,.06)}
+.site-row.drag-src{opacity:.4}
+.site-row.drag-over-top{border-top:3px solid var(--blue)}
+.site-row.drag-over-bot{border-bottom:3px solid var(--blue)}
+.sln{font-size:13px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slt{font-size:11px;color:var(--ink3);margin-top:2px}
+.slneed{margin-top:4px}
+.nbadge{font-size:10px;background:var(--gray);border-radius:3px;padding:2px 5px;color:var(--ink2);font-weight:600}
+.dc{border-right:1px solid var(--wbl);padding:4px 3px;min-height:80px;transition:.1s;position:relative}
+.dc.sun{background:rgba(220,53,69,.04)}.dc.sat{background:rgba(0,113,227,.04)}.dc.tod{background:rgba(0,113,227,.07)}
+.dc.drag-over{background:var(--blue-lt);outline:2px dashed var(--blue);outline-offset:-2px;z-index:1}
+.dc.blocked{background:repeating-linear-gradient(45deg,rgba(220,53,69,.04),rgba(220,53,69,.04) 4px,transparent 4px,transparent 8px)}
+/* 配置カード */
+.asgn{border:1.5px solid transparent;border-radius:6px;padding:4px 5px;margin-bottom:3px;display:flex;flex-direction:column;gap:2px;transition:.1s;position:relative;overflow:visible}
+.asgn:hover{box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.asgn-top{display:flex;align-items:center;gap:3px}
+.asgn-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px}
+.asgn-name{font-size:11px;font-weight:800;line-height:1.3;word-break:break-all;white-space:normal;flex:1;letter-spacing:.02em}
+.asgn-actions{display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin-top:1px}
+.asgn .rx{position:absolute;top:-5px;right:-5px;width:16px;height:16px;background:var(--red);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:9px;color:#fff;cursor:pointer;z-index:2;font-weight:900}
+.asgn:hover .rx{display:flex}
+/* OKバッジ */
+.ok-badge{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:18px;border-radius:4px;padding:0 4px;font-size:10px;font-weight:900;cursor:pointer;flex-shrink:0;border:2px solid #ddd;color:#bbb;background:#f5f5f5;transition:all .15s;user-select:none;white-space:nowrap}
+.ok-badge:hover{border-color:#888;color:#888;background:#e8e8e8}
+.ok-badge.ok-pre{background:#1c1c1c;border-color:#1c1c1c;color:#fff}
+.ok-badge.ok-day{background:#e02020;border-color:#c01010;color:#fff}
+/* check列 */
+.cc{background:#fff;border-left:2px solid var(--wbl);padding:4px 3px;min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;position:sticky;right:0;z-index:5;width:54px}
+.ck{width:24px;height:24px;border:2px solid #ccc;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:.15s;flex-shrink:0}
+.ck.done{background:var(--green);border-color:var(--green);color:#fff}
+.cklbl{font-size:9px;color:var(--ink3);text-align:center;line-height:1.3}
+
+/* RIGHT PANEL */
+.rp{width:210px;background:#fff;border-left:1px solid #e0e0e0;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.rs{padding:12px 14px;border-bottom:1px solid var(--wbl)}
+.rst{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px}
+.ts{background:var(--gray);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:11px}
+.tsn{font-weight:700;margin-bottom:3px}
+.tss{color:var(--ink2)}.tss.empty{color:var(--red);font-style:italic}
+.str{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12px;border-bottom:1px solid var(--wbl)}
+.str:last-child{border-bottom:none}
+.stl{color:var(--ink2)}.stv{font-weight:700}
+.leg{display:flex;align-items:center;gap:8px;font-size:11px;margin-bottom:6px;color:var(--ink2)}
+.lc{width:15px;height:15px;border-radius:4px;flex-shrink:0}
+
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;display:none;align-items:center;justify-content:center}
+.mo.open{display:flex}
+.md{background:#fff;border-radius:14px;padding:22px;width:360px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:85vh;overflow-y:auto}
+.mdt{font-size:15px;font-weight:700;margin-bottom:14px}
+.mf{margin-bottom:10px}
+.ml{display:block;font-size:10px;font-weight:600;color:var(--ink2);margin-bottom:3px}
+.mi{width:100%;border:1.5px solid #d0d0d0;border-radius:7px;padding:7px 10px;font-family:inherit;font-size:12px;outline:none}
+.mi:focus{border-color:var(--blue)}
+.ma{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+
+/* Staff detail panel */
+.detail-panel{position:fixed;right:0;top:52px;width:280px;background:#fff;border-left:1px solid #e0e0e0;height:calc(100vh - 52px);z-index:50;transform:translateX(100%);transition:.25s;box-shadow:-4px 0 20px rgba(0,0,0,.1);overflow-y:auto;padding:16px}
+.detail-panel.open{transform:translateX(0)}
+.dp-close{position:absolute;top:12px;right:12px;background:var(--gray);border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px}
+.dp-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;margin:0 auto 12px}
+.dp-name{font-size:18px;font-weight:900;text-align:center;margin-bottom:2px}
+.dp-kana{font-size:10px;color:var(--ink3);text-align:center;margin-bottom:12px}
+.dp-row{display:flex;gap:8px;margin-bottom:6px;font-size:11px;align-items:baseline}
+.dp-key{color:var(--ink3);min-width:60px;font-weight:600}
+.dp-val{color:var(--ink);flex:1}
+.dp-divider{border:none;border-top:1px solid var(--wbl);margin:10px 0}
+
+#drag-ghost{position:fixed;pointer-events:none;z-index:9999;background:var(--blue);color:#fff;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:700;box-shadow:0 4px 12px rgba(0,113,227,.4);display:none;transform:translate(-50%,-50%);white-space:nowrap}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media print{
+  body{background:#fff}
+  .sb,.rp,.hd-acts,.hd-logo{display:none}
+  .main{display:block}
+  .wb-wrap{padding:0;overflow:visible}
+  .wb{box-shadow:none;border-radius:0}
+  .detail-panel{display:none}
+}</style>
+</head>
+<body>
+<div id="drag-ghost"></div>
+
+<!-- HEADER -->
+<!-- file:// 警告バナー（必要な場合のみ表示） -->
+<div id="file-warning" style="display:none;background:#fff3cd;border-bottom:1px solid #ffc107;padding:8px 16px;font-size:12px;color:#856404;text-align:center">
+  ⚠️ <strong>「ファイルから開く（file://）」では自動保存が動作しません。</strong>
+  解決方法：① HTMLファイルをChromeにドラッグして開く → それでもダメなら ②
+  <a href="https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer" target="_blank" style="color:#0071e3">VS Code Live Server</a> などのローカルサーバーで開いてください。
+  または <strong>💾 保存</strong> ボタンでJSONをダウンロードしてバックアップしてください。
+</div>
+
+<div class="hd">
+  <div class="hd-logo">配置表<span>システム</span></div>
+  <div class="mnav">
+    <button onclick="chMonth(-1)">◀</button>
+    <div class="mdisp" id="mdisp"></div>
+    <button onclick="chMonth(1)">▶</button>
+  </div>
+  <div class="hd-acts">
+    <div style="display:flex;align-items:center;gap:6px;background:var(--gray);border-radius:8px;padding:4px 10px;cursor:pointer" onclick="openMo('setOperator')" title="担当者名を変更">
+      <span style="font-size:11px;color:var(--ink3)">担当者：</span>
+      <span style="font-size:12px;font-weight:700;color:var(--ink)" id="operatorDisp">（未設定）</span>
+      <span style="font-size:10px;color:var(--ink3)">✏️</span>
+    </div>
+    <div style="width:1px;height:24px;background:#ddd"></div>
+    <button class="btn btn-s" onclick="openMo('addStaff')">＋ 隊員</button>
+    <button class="btn btn-s" onclick="openMo('addSite')">＋ 現場</button>
+    <button class="btn btn-g" onclick="openMo('addLeave')">🏖 休み登録</button>
+    <button class="btn btn-o" onclick="openMo('leaveList')">📋 休み一覧</button>
+    <div style="width:1px;height:24px;background:#ddd"></div>
+    <span id="ls-save-time" style="font-size:10px;color:var(--ink3);white-space:nowrap"></span>
+    <div style="width:1px;height:24px;background:#ddd"></div>
+    <button class="btn btn-s" onclick="openMo('changelog')" title="変更履歴">📜 変更履歴</button>
+    <button class="btn btn-s" onclick="loadData()" title="JSONを読み込む">📂 読込</button>
+    <button class="btn btn-p" onclick="saveData()">💾 保存</button>
+    <button class="btn" id="sb-sync-btn" style="background:#3ecf8e;color:#fff;font-weight:700;display:none" onclick="supabasePush()" title="クラウドに保存">☁️ 同期</button>
+    <button class="btn btn-s" onclick="openMo('supabaseConfig')" title="クラウド設定">⚙️ クラウド</button>
+    <button class="btn btn-s" onclick="window.print()">🖨 印刷</button>
+  </div>
+</div>
+
+<div class="main">
+<!-- LEFT SIDEBAR -->
+<div class="sb">
+  <div class="sb-top">
+    <input class="sb-search" id="staffSearch" placeholder="🔍 名前で検索..." oninput="renderSb()">
+    <div class="sb-filter">
+      <button class="fchip active" id="fc-all" onclick="setFilter('all')">全員</button>
+      <button class="fchip" id="fc-avail" onclick="setFilter('avail')">出勤可</button>
+      <button class="fchip" id="fc-f" onclick="setFilter('female')">女性</button>
+    </div>
+  </div>
+  <div class="sb-sec" id="sb-count"></div>
+  <div class="staff-list" id="staffList"></div>
+</div>
+
+<!-- WHITEBOARD -->
+<div class="wb-wrap">
+  <div class="wb" id="wb"></div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="rp">
+  <div class="rs">
+    <div class="rst">📅 今日の配置</div>
+    <div id="todayPanel"></div>
+  </div>
+  <div class="rs">
+    <div class="rst">📊 月間統計</div>
+    <div id="statsPanel"></div>
+  </div>
+  <div class="rs">
+    <div class="rst">🎨 凡例</div>
+    <div class="leg"><div class="lc" style="background:var(--day-bg);border:1px solid var(--day-border)"></div>☀️ 日勤</div>
+    <div class="leg"><div class="lc" style="background:var(--night-bg);border:1px solid var(--night-border)"></div>🌙 夜勤</div>
+    <div class="leg"><div class="lc" style="background:var(--green)"></div>配置済み</div>
+    <div class="leg"><div class="lc" style="background:#fff3cd;border:1px solid var(--yellow)"></div>休み登録済み</div>
+    <hr style="border:none;border-top:1px solid var(--wbl);margin:4px 0">
+    <div style="font-size:9px;font-weight:700;color:var(--ink3);letter-spacing:.08em;margin-bottom:5px">OK確認バッジ</div>
+    <div class="leg"><span class="ok-badge" style="min-width:36px;height:18px;font-size:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900">OK?</span>未確認</div>
+    <div class="leg"><span class="ok-badge ok-pre" style="min-width:36px;height:18px;font-size:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900">黒OK</span>事前に内諾済み</div>
+    <div class="leg"><span class="ok-badge ok-day" style="min-width:36px;height:18px;font-size:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:900">赤OK</span>前日に返信確認済み</div>
+    <hr style="border:none;border-top:1px solid var(--wbl);margin:4px 0">
+    <div class="leg"><div class="lc" style="background:rgba(220,53,69,.12);border:1px dashed var(--red)"></div>日曜・祝日</div>
+    <div class="leg"><div class="lc" style="background:rgba(0,113,227,.08);border:1px dashed #0071e3"></div>土曜</div>
+    <div class="leg"><div class="lc" style="background:rgba(0,113,227,.12)"></div>今日</div>
+  </div>
+</div>
+</div>
+
+<!-- STAFF DETAIL -->
+<div class="detail-panel" id="detailPanel">
+  <button class="dp-close" onclick="closeDetail()">✕ 閉じる</button>
+  <div id="detailContent"></div>
+</div>
+
+<!-- MODALS -->
+<div class="mo" id="mo-addStaff">
+  <div class="md">
+    <div class="mdt">👤 隊員追加</div>
+    <div class="mf"><label class="ml">コード</label><input class="mi" id="ns-code" placeholder="例：000001"></div>
+    <div class="mf"><label class="ml">氏名</label><input class="mi" id="ns-name" placeholder="例：田中 太郎"></div>
+    <div class="mf"><label class="ml">フリガナ</label><input class="mi" id="ns-kana" placeholder="例：タナカタロウ"></div>
+    <div class="mf"><label class="ml">生年月日</label><input class="mi" type="date" id="ns-birth"></div>
+    <div class="mf"><label class="ml">性別</label>
+      <select class="mi" id="ns-sex"><option value="男">男</option><option value="女">女</option></select>
+    </div>
+    <div class="mf"><label class="ml">入社日</label><input class="mi" type="date" id="ns-join"></div>
+    <div class="mf"><label class="ml">経験年数</label><input class="mi" type="number" id="ns-exp" value="0" min="0"></div>
+    <div class="mf"><label class="ml">携帯電話</label><input class="mi" id="ns-tel" placeholder="090-xxxx-xxxx"></div>
+    <div class="mf"><label class="ml">住所</label><input class="mi" id="ns-addr" placeholder="神奈川県横浜市..."></div>
+    <div class="ma">
+      <button class="btn btn-s" onclick="closeMo('addStaff')">キャンセル</button>
+      <button class="btn btn-p" onclick="addStaff()">追加</button>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="mo-addSite">
+  <div class="md">
+    <div class="mdt">🏢 現場追加</div>
+    <div class="mf"><label class="ml">契約先（会社名）</label><input class="mi" id="site-client" placeholder="例：公益財団法人三渓園保勝会"></div>
+    <div class="mf"><label class="ml">現場名</label><input class="mi" id="site-name" placeholder="例：三渓園　日勤"></div>
+    <div class="mf"><label class="ml">勤務時間</label><input class="mi" id="site-time" placeholder="例：08:00～17:00"></div>
+    <div class="mf"><label class="ml">必要人数</label><input class="mi" type="number" id="site-need" value="1" min="1" max="10"></div>
+    <div class="mf"><label class="ml">契約タイプ</label>
+      <select class="mi" id="site-contract" onchange="toggleActiveDays('add')">
+        <option value="permanent">常駐（毎日）</option>
+        <option value="regular">定期（曜日指定）</option>
+        <option value="spot">スポット（不定期）</option>
+        <option value="term">期限付き</option>
+      </select>
+    </div>
+    <div id="add-term-row" style="display:none">
+      <div class="mf"><label class="ml">開始日</label><input class="mi" type="date" id="site-term-start"></div>
+      <div class="mf"><label class="ml">終了日</label><input class="mi" type="date" id="site-term-end"></div>
+    </div>
+    <div class="mf" id="add-activedays-row" style="display:none">
+      <label class="ml">稼働曜日（クリックで選択）</label>
+      <div id="add-day-btns" style="display:flex;gap:5px;margin-top:4px"></div>
+    </div>
+    <div class="mf"><label class="ml">シフト区分</label>
+      <select class="mi" id="site-shift">
+        <option value="day">☀️ 日勤</option>
+        <option value="night">🌙 夜勤</option>
+        <option value="other">— 指定なし</option>
+      </select>
+    </div>
+    <div class="mf"><label class="ml">警備号数</label>
+      <select class="mi" id="site-guard">
+        <option value="1">1号警備（施設警備）</option>
+        <option value="2">2号警備（交通誘導）</option>
+        <option value="3">3号警備（輸送警備）</option>
+        <option value="4">4号警備（身辺警備）</option>
+      </select>
+    </div>
+    <div class="mf"><label class="ml">資格区分</label>
+      <select class="mi" id="site-qual">
+        <option value="general">一般（無資格）</option>
+        <option value="qualified">有資格者</option>
+        <option value="certified">検定合格者</option>
+      </select>
+    </div>
+    <div class="ma">
+      <button class="btn btn-s" onclick="closeMo('addSite')">キャンセル</button>
+      <button class="btn btn-p" onclick="addSite()">追加</button>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="mo-editSite">
+  <div class="md">
+    <div class="mdt">✏️ 現場を編集</div>
+    <input type="hidden" id="edit-site-id">
+    <div class="mf"><label class="ml">契約先（会社名）</label><input class="mi" id="edit-site-client"></div>
+    <div class="mf"><label class="ml">現場名</label><input class="mi" id="edit-site-name"></div>
+    <div class="mf"><label class="ml">勤務時間</label><input class="mi" id="edit-site-time"></div>
+    <div class="mf"><label class="ml">必要人数</label><input class="mi" type="number" id="edit-site-need" min="1" max="10"></div>
+    <div class="mf"><label class="ml">契約タイプ</label>
+      <select class="mi" id="edit-site-contract" onchange="toggleActiveDays('edit')">
+        <option value="permanent">常駐（毎日）</option>
+        <option value="regular">定期（曜日指定）</option>
+        <option value="spot">スポット（不定期）</option>
+        <option value="term">期限付き</option>
+      </select>
+    </div>
+    <div id="edit-term-row" style="display:none">
+      <div class="mf"><label class="ml">開始日</label><input class="mi" type="date" id="edit-site-term-start"></div>
+      <div class="mf"><label class="ml">終了日</label><input class="mi" type="date" id="edit-site-term-end"></div>
+    </div>
+    <div class="mf" id="edit-activedays-row" style="display:none">
+      <label class="ml">稼働曜日（クリックで選択）</label>
+      <div id="edit-day-btns" style="display:flex;gap:5px;margin-top:4px"></div>
+    </div>
+    <div class="mf"><label class="ml">シフト区分</label>
+      <select class="mi" id="edit-site-shift">
+        <option value="day">☀️ 日勤</option>
+        <option value="night">🌙 夜勤</option>
+        <option value="other">— 指定なし</option>
+      </select>
+    </div>
+    <div class="mf"><label class="ml">警備号数</label>
+      <select class="mi" id="edit-site-guard">
+        <option value="1">1号警備（施設警備）</option>
+        <option value="2">2号警備（交通誘導）</option>
+        <option value="3">3号警備（輸送警備）</option>
+        <option value="4">4号警備（身辺警備）</option>
+      </select>
+    </div>
+    <div class="mf"><label class="ml">資格区分</label>
+      <select class="mi" id="edit-site-qual">
+        <option value="general">一般（無資格）</option>
+        <option value="qualified">有資格者</option>
+        <option value="certified">検定合格者</option>
+      </select>
+    </div>
+    <div class="ma" style="justify-content:space-between">
+      <button class="btn btn-r" onclick="deleteSiteFromModal()">🗑 削除</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-s" onclick="closeMo('editSite')">キャンセル</button>
+        <button class="btn btn-p" onclick="saveEditSite()">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="mo-addLeave">
+  <div class="md">
+    <div class="mdt">🏖 休み・不在登録</div>
+    <div class="mf"><label class="ml">隊員</label>
+      <select class="mi" id="lv-staff"></select>
+    </div>
+    <div class="mf"><label class="ml">開始日</label><input class="mi" type="date" id="lv-start"></div>
+    <div class="mf"><label class="ml">終了日</label><input class="mi" type="date" id="lv-end"></div>
+    <div class="mf"><label class="ml">区分</label>
+      <select class="mi" id="lv-reason">
+        <option>有休</option><option>公休</option><option>病欠</option>
+        <option>研修</option><option>不在</option><option>その他</option>
+      </select>
+    </div>
+    <div class="ma">
+      <button class="btn btn-s" onclick="closeMo('addLeave')">キャンセル</button>
+      <button class="btn btn-g" onclick="addLeave()">登録</button>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="mo-leaveList">
+  <div class="md" style="width:440px">
+    <div class="mdt">📋 休み一覧</div>
+    <div id="lvListContent" style="max-height:320px;overflow-y:auto"></div>
+    <div class="ma"><button class="btn btn-s" onclick="closeMo('leaveList')">閉じる</button></div>
+  </div>
+</div>
+
+<!-- 担当者設定 -->
+<div class="mo" id="mo-setOperator">
+  <div class="md" style="width:320px">
+    <div class="mdt">👤 担当者名を設定</div>
+    <div class="mf">
+      <label class="ml">あなたの名前（変更ログに記録されます）</label>
+      <input class="mi" id="operatorInput" placeholder="例：岩野 経人">
+    </div>
+    <div class="ma">
+      <button class="btn btn-s" onclick="closeMo('setOperator')">キャンセル</button>
+      <button class="btn btn-p" onclick="setOperator()">設定</button>
+    </div>
+  </div>
+</div>
+
+<!-- 変更履歴 -->
+<div class="mo" id="mo-changelog">
+  <div class="md" style="width:560px">
+    <div class="mdt" style="display:flex;justify-content:space-between;align-items:center">
+      <span>📜 変更履歴</span>
+      <button class="btn btn-s" style="font-size:10px" onclick="changeLogs=[];renderChangelog();toast('ログをクリアしました','ok')">🗑 クリア</button>
+    </div>
+    <div id="changelogContent" style="max-height:420px;overflow-y:auto;font-size:11px"></div>
+    <div class="ma"><button class="btn btn-s" onclick="closeMo('changelog')">閉じる</button></div>
+  </div>
+</div>
+
+<!-- ファイル読込用（非表示） -->
+<input type="file" id="fileInput" accept=".json" style="display:none" onchange="onFileLoad(event)">
+
+<!-- Supabase設定モーダル -->
+<div class="mo" id="mo-supabaseConfig">
+  <div class="md" style="width:460px">
+    <div class="mdt">☁️ クラウド同期設定（Supabase）</div>
+
+    <div style="background:#e8f5e9;border:1px solid #4caf50;border-radius:8px;padding:10px 12px;font-size:11px;color:#1b5e20;margin-bottom:14px;line-height:1.7">
+      <strong>Supabase（無料）を使うと：</strong><br>
+      ✅ ブラウザを閉じても自動保存<br>
+      ✅ 別のパソコン・スマホから同じデータを開ける<br>
+      ✅ 担当者が変わっても最新データをすぐ共有できる
+    </div>
+
+    <div style="background:#fff3e0;border:1px solid #ffa726;border-radius:8px;padding:10px 12px;font-size:11px;color:#e65100;margin-bottom:14px;line-height:1.8">
+      <strong>📋 初回セットアップ手順（5分）</strong><br>
+      1. <a href="https://supabase.com" target="_blank" style="color:#0071e3">supabase.com</a> で無料アカウント作成<br>
+      2. 「New Project」でプロジェクトを作成<br>
+      3. 左メニュー「SQL Editor」を開き、以下を実行：<br>
+      <code style="display:block;background:#fff8f0;padding:6px 8px;border-radius:4px;margin-top:4px;font-size:10px;white-space:pre-wrap">CREATE TABLE haichi (
+  id TEXT PRIMARY KEY,
+  data JSONB,
+  updated_at TIMESTAMPTZ DEFAULT now()
+);</code>
+      4. 左メニュー「Settings → API」から<br>
+      　 Project URL と anon key をコピーして下に貼り付け
+    </div>
+
+    <div class="mf">
+      <label class="ml">Project URL</label>
+      <input class="mi" id="sb-url" placeholder="https://xxxxxxxxxxxx.supabase.co" value="">
+    </div>
+    <div class="mf">
+      <label class="ml">anon public key</label>
+      <input class="mi" id="sb-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." value="">
+    </div>
+    <div class="mf">
+      <label class="ml">データID（同じIDを使う人が同じデータを共有）</label>
+      <input class="mi" id="sb-dataid" placeholder="例：kokusai-renpou-2026" value="">
+    </div>
+
+    <div id="sb-status" style="font-size:11px;margin-bottom:8px;min-height:18px"></div>
+
+    <div class="ma" style="justify-content:space-between">
+      <button class="btn btn-s" onclick="sbTestConnection()">🔌 接続テスト</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-s" onclick="closeMo('supabaseConfig')">閉じる</button>
+        <button class="btn btn-p" onclick="sbSaveConfig()">✅ 設定を保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- メモ入力 -->
+<div class="mo" id="mo-memo">
+  <div class="md" style="width:380px">
+    <div class="mdt" id="memo-modal-title">📝 メモ</div>
+    <div class="mf">
+      <label class="ml">メモ内容（急な変更・引き継ぎ事項など）</label>
+      <textarea class="mi" id="memo-text" rows="5" style="resize:vertical" placeholder="例：先方より開始時間が30分早まると連絡あり。08:00→07:30に変更。"></textarea>
+    </div>
+    <div class="ma" style="justify-content:space-between">
+      <button class="btn" style="background:#fff9c4;color:#7a6000;border:1px solid #f9e04b" onclick="clearMemo()">🗑 メモ削除</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-s" onclick="closeMo('memo')">キャンセル</button>
+        <button class="btn btn-p" onclick="saveMemo()">💾 保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== STAFF DATA (179名・隊員名簿より) =====
+const COLORS=['#0071e3','#28a745','#6f42c1','#fd7e14','#20c997','#dc3545','#6610f2','#e83e8c','#17a2b8','#795548','#607d8b','#9c27b0','#ff5722','#009688','#3f51b5','#f44336','#e91e63','#ff9800','#8bc34a','#00bcd4'];
+
+const STAFF_RAW = [
+['000746','青木 薫','ｱｵｷｶｵﾙ','1957/12/05',68,'男','2025/03/30',0,'070-1478-9387','横浜市南区睦町'],
+['000766','安住 貢一','ｱｽﾞﾐｺｳｲﾁ','1953/05/04',72,'男','2025/10/29',0,'080-5437-2330','横浜市泉区下飯田町'],
+['000656','阿部 徹夫','ｱﾍﾞﾃﾂｵ','1942/11/14',83,'男','2022/10/15',3,'090-8720-0333','横浜市旭区上川井町'],
+['000492','阿部 一','ｱﾍﾞﾊｼﾞﾒ','1956/10/15',69,'男','2018/11/22',7,'090-4434-7627','横浜市南区庚台'],
+['000682','池崎 和裕','ｲｹｻﾞｷｶｽﾞﾋﾛ','1963/01/27',63,'男','2024/01/11',2,'080-5026-2107','横浜市磯子区磯子'],
+['000763','池田 英二','ｲｹﾀﾞｴｲｼﾞ','1950/05/08',75,'男','2025/08/30',0,'080-1152-1110','横浜市中区千代崎町'],
+['000762','池田 雄三','ｲｹﾀﾞﾕｳｿﾞｳ','1950/05/08',75,'男','2025/08/30',0,'090-903-3233','横浜市中区千代崎町'],
+['000712','石井 和利','ｲｼｲｶｽﾞﾄｼ','1957/09/08',68,'男','2024/08/28',1,'070-3546-7808','横須賀市鷹取'],
+['000337','礒貝 治郎','ｲｿｶﾞｲｼﾞﾛｳ','1949/09/16',76,'男','2016/10/14',9,'','横浜市旭区中希望が丘'],
+['000667','磯部 甲子男','ｲｿﾍﾞｷﾈｵ','1939/07/26',86,'男','2023/04/19',2,'090-3599-1421','横浜市中区本牧原'],
+['000721','依田 義博','ｲﾀﾞﾖｼﾋﾛ','1973/12/06',52,'男','2024/10/19',1,'080-3481-6642','藤沢市菖蒲沢'],
+['000724','市瀬 博章','ｲﾁｾﾋﾛｱｷ','1956/12/11',69,'男','2024/10/29',1,'090-2316-9530','横須賀市浦賀'],
+['000749','伊東 光雄','ｲﾄｳﾐﾂｵ','1948/06/06',77,'男','2025/03/28',0,'','平塚市東真土'],
+['000617','稲葉 幸司','ｲﾅﾊﾞｺｳｼﾞ','1948/10/04',77,'男','2023/03/23',2,'090-9306-0464','横浜市旭区善部町'],
+['000755','井上 貴文','ｲﾉｳｴﾀｶﾌﾐ','1981/02/09',45,'男','2025/05/01',0,'070-8422-8261','海老名市杉久保北'],
+['000769','井上 哲也','ｲﾉｳｴﾃﾂﾔ','1955/01/08',71,'男','2026/01/08',0,'',''],
+['000112','岩城 令子','ｲﾜｷﾚｲｺ','1957/01/27',69,'女','1986/09/03',39,'080-1152-0183','横浜市旭区若葉台'],
+['000008','岩崎 真也','ｲﾜｻｷｼﾝﾔ','1975/08/04',50,'男','1995/07/14',30,'','横浜市旭区鶴ヶ峰'],
+['000668','岩田 佑太','ｲﾜﾀﾕｳﾀ','1999/07/06',26,'男','2023/06/15',2,'090-2763-9024','横浜市戸塚区平戸'],
+['000310','岩野 拓人','ｲﾜﾉﾀｸﾄ','1997/10/09',28,'男','2026/01/16',0,'090-1846-2191','大和市渋谷'],
+['001000','岩野 経人','ｲﾜﾉﾂﾈﾄ','1965/03/01',61,'男','1983/05/09',42,'','横浜市旭区東希望が丘'],
+['000002','岩野 正幸','ｲﾜﾉﾏｻﾕｷ','1969/08/15',56,'男','1993/08/12',32,'090-3139-2569',''],
+['000468','岩野 かおる','ｲﾜﾉｶｵﾙ','1970/09/02',55,'女','2018/04/01',7,'',''],
+['000555','岩野 賢人','ｲﾜﾉｹﾝﾄ','1993/12/06',32,'男','2022/01/11',4,'090-9813-4409','藤沢市湘南台'],
+['000528','上野 大吾','ｳｴﾉﾀﾞｲｺﾞ','1981/05/25',44,'男','2019/10/11',6,'090-7717-5533','横浜市旭区中希望が丘'],
+['000704','上山 三男','ｳｴﾔﾏﾐﾂｵ','1952/07/10',73,'男','2024/05/22',1,'090-5582-8663','横浜市戸塚区上矢部町'],
+['000245','氏家 榮子','ｳｼﾞｲｴｴｲｺ','1949/12/09',76,'女','2014/04/01',11,'090-1040-9900','横浜市金沢区富岡東'],
+['000532','内田 裕美','ｳﾁﾀﾞﾕﾐ','1951/06/11',74,'女','2020/01/08',6,'090-4722-0050','横浜市旭区本宿町'],
+['000697','榎本 英樹','ｴﾉﾓﾄﾋﾃﾞｷ','1984/02/05',42,'男','2024/04/01',1,'090-1451-0288','海老名市杉久保北'],
+['000557','海老澤 康夫','ｴﾋﾞｻﾜﾔｽｵ','1958/10/23',67,'男','2020/05/19',5,'070-2181-8756','横浜市旭区東希望が丘'],
+['000736','大石 真由実','ｵｵｲｼﾏﾕﾐ','1980/11/03',45,'女','2025/02/27',0,'090-3914-2456','横浜市戸塚区矢部町'],
+['000990','大川 義男','ｵｵｶﾜﾖｼｵ','1945/08/29',80,'男','2024/03/01',2,'','横浜市港南区丸山台'],
+['000748','大谷 俊一','ｵｵﾀﾆｼｭﾝｲﾁ','1948/03/08',78,'男','2025/03/28',0,'090-5349-5389','平塚市明石町'],
+['000694','大谷 夫美雄','ｵｵﾀﾆﾌﾐｵ','1950/04/01',75,'男','2024/04/03',1,'090-4943-2046','横浜市栄区鍛冶ケ谷町'],
+['000673','大塚 恒一','ｵｵﾂｶｺｳｲﾁ','1948/06/07',77,'男','2023/09/28',2,'090-5340-4183','横浜市磯子区岡村'],
+['000068','大沼 勇美','ｵｵﾇﾏｲｻﾐ','1949/09/10',76,'男','2025/07/10',0,'080-1035-2350','座間市西栗原'],
+['000675','大町 宗晴','ｵｵﾏﾁﾑﾈﾊﾙ','1950/12/20',75,'男','2023/10/18',2,'090-1614-2584','横浜市中区本牧三之谷'],
+['000728','大本 卓','ｵｵﾓﾄﾀｶｼ','1969/09/09',56,'男','2024/11/18',1,'090-2454-6870','横浜市保土ケ谷区上菅田町'],
+['000764','大森 操','ｵｵﾓﾘﾐｻｵ','1951/04/21',74,'男','2025/09/01',0,'090-5812-8661','横浜市栄区野七里'],
+['000633','大用 加津彦','ｵｵﾖｳｶｽﾞﾋｺ','1956/11/22',69,'男','2022/05/02',3,'','秦野市今泉'],
+['000774','岡部 浩二','ｵｶﾍﾞｺｳｼﾞ','1974/11/03',51,'男','2026/02/26',0,'080-6722-3565','横浜市西区境之谷'],
+['000745','岡本 義範','ｵｶﾓﾄﾖｼﾉﾘ','1946/07/17',79,'男','2025/03/30',0,'070-1553-7117','横浜市西区北軽井沢'],
+['000771','小川 峰生','ｵｶﾞﾜﾎｳｾｲ','1965/09/23',60,'男','2026/02/02',0,'090-2440-4089','茅ヶ崎市菱沼'],
+['000566','長田 敏裕','ｵｻﾀﾞﾄｼﾋﾛ','1962/12/03',63,'男','2020/07/29',5,'090-5863-9988','横浜市戸塚区前田町'],
+['000246','小田野 勇','ｵﾀﾞﾉｲｻﾑ','1947/01/25',79,'男','2016/04/01',9,'090-2413-9054','横浜市南区永田東'],
+['000465','小田 博','ｵﾀﾞﾋﾛｼ','1943/05/24',82,'男','2018/04/01',7,'','横浜市保土ケ谷区神戸町'],
+['000328','葛西 和雄','ｶｻｲｶｽﾞｵ','1952/05/14',73,'男','2023/03/22',2,'080-3451-8269','綾瀬市寺尾西'],
+['000116','柏木 敏行','ｶｼﾜｷﾞﾄｼﾕｷ','1950/05/28',75,'男','2011/10/03',14,'090-5315-2059','横浜市瀬谷区二ツ橋町'],
+['000029','加藤 黄一','ｶﾄｳｺｳｲﾁ','1953/02/13',73,'男','2004/03/18',22,'070-5574-5207','横浜市栄区小菅ヶ谷'],
+['000772','加藤 愛己','ｶﾄｳﾖｼｷ','1950/06/11',75,'男','2026/02/02',0,'090-4361-5776','横浜市戸塚区汲沢町'],
+['000760','金子 信安','ｶﾈｺﾉﾌﾞﾔｽ','1954/10/20',71,'男','2025/08/10',0,'090-4923-5061','大和市上草柳'],
+['000661','狩野 達行','ｶﾉｳﾀﾂﾕｷ','1948/11/29',77,'男','2023/03/28',2,'090-3134-3327','三浦市宮川町'],
+['000706','川口 秀昭','ｶﾜｸﾞﾁﾋﾃﾞｱｷ','1950/12/09',75,'男','2024/06/30',1,'090-6167-2864','横浜市南区永田東'],
+['000688','川口 英雄','ｶﾜｸﾞﾁﾋﾃﾞｵ','1950/09/26',75,'男','2024/03/28',1,'070-4091-9423','横浜市栄区長沼町'],
+['000681','川島 満春','ｶﾜｼﾏﾐﾂﾊﾙ','1953/04/04',72,'男','2023/12/22',2,'090-7282-3120','横浜市金沢区瀬戸'],
+['000770','川村 法由','ｶﾜﾑﾗﾉﾘﾖｼ','1960/09/19',65,'男','2026/01/27',0,'090-5231-8919','横浜市南区永田北'],
+['000500','菅野 利吉','ｶﾝﾉﾘｷﾁ','1945/01/09',81,'男','2019/03/04',7,'','横浜市港南区港南台'],
+['000187','木立 富男','ｷﾀﾞﾁﾄﾐｵ','1942/07/10',83,'男','2012/11/29',13,'','横浜市栄区鍛冶ケ谷'],
+['000758','北原 英二','ｷﾀﾊﾗｴｲｼﾞ','1949/12/24',76,'男','2025/07/17',0,'090-3529-4296','相模原市南区上鶴間'],
+['000594','貴戸 茂','ｷﾄﾞｼｹﾞﾙ','1951/03/01',75,'男','2021/04/07',4,'070-7521-3892','横浜市港北区小机町'],
+['000739','貴納 秀郎','ｷﾉｳﾋﾃﾞｵ','1949/06/12',76,'男','2025/03/26',0,'090-4393-2905','横浜市西区岡野'],
+['001004','木野 伸一郎','ｷﾉｼﾝｲﾁﾛｳ','1958/01/23',68,'男','2026/01/23',0,'',''],
+['000731','木村 凌武','ｷﾑﾗｼﾉﾑ','2006/02/08',20,'男','2024/12/06',1,'080-5644-0406','横浜市旭区今宿町'],
+['000530','木村 純一','ｷﾑﾗｼﾞｭﾝｲﾁ','1970/05/25',55,'男','2019/10/28',6,'080-3022-5725','大和市福田'],
+['000753','木村 宏紀','ｷﾑﾗﾋﾛﾉﾘ','1978/09/25',47,'男','2025/04/28',0,'070-197-3224','横浜市金沢区西柴'],
+['000535','工藤 太護','ｸﾄﾞｳﾀｲｺﾞ','1983/02/28',43,'男','2020/02/24',6,'080-8096-9646','横浜市旭区東希望が丘'],
+['000304','熊谷 孝一','ｸﾏｶﾞｲｺｳｲﾁ','1955/01/16',71,'男','2015/12/18',10,'080-3121-5057','横浜市瀬谷区下瀬谷'],
+['000306','熊谷 強','ｸﾏｶﾞｲﾂﾖｼ','1946/02/14',80,'男','2016/01/25',10,'','横浜市泉区上飯田町'],
+['000757','倉知 祐二','ｸﾗﾁﾕｳｼﾞ','1951/12/05',74,'男','2025/06/24',0,'090-2485-6370','鎌倉市津西'],
+['000735','栗山 重之','ｸﾘﾔﾏｼｹﾞﾕｷ','1961/04/11',64,'男','2025/01/27',1,'070-5089-8530','横須賀市長沢'],
+['000188','小芝 次雄','ｺｼﾊﾞﾂｷﾞｵ','1957/12/07',68,'男','2012/12/12',13,'090-9158-1354','横浜市旭区東希望が丘'],
+['000714','小松 爽太','ｺﾏﾂｿｳﾀ','2000/05/20',25,'男','2024/09/06',1,'080-9402-7997','横須賀市鴨居'],
+['000680','小室 将光','ｺﾑﾛﾏｻﾐﾂ','1954/08/15',71,'男','2023/12/17',2,'090-2221-4603','横浜市旭区上白根町'],
+['000319','小山 邦浩','ｺﾔﾏｸﾆﾋﾛ','1955/04/10',70,'男','2016/03/28',9,'090-9688-2282','藤沢市辻堂'],
+['000659','小山 哲哉','ｺﾔﾏﾃﾂﾔ','1956/08/11',69,'男','2023/03/20',2,'090-1547-6614','横浜市中区池袋'],
+['000634','今 勇治','ｺﾝﾕｳｼﾞ','1958/10/27',67,'男','2022/05/16',3,'090-9378-5998','横浜市旭区川井本町'],
+['000576','堺 徳英','ｻｶｲﾄｸｴ','1948/07/10',77,'男','2020/11/24',5,'090-5809-8967','横浜市磯子区洋光台'],
+['000204','坂本 友明','ｻｶﾓﾄﾄﾓｱｷ','1941/11/18',84,'男','2013/04/01',12,'090-4718-4871','横浜市保土ケ谷区川島町'],
+['000747','櫻田 浩二','ｻｸﾗﾀﾞｺｳｼﾞ','1957/11/17',68,'男','2025/03/31',0,'090-2633-6203','秦野市南矢名'],
+['000761','佐藤 安','ｻﾄｳﾔｽｼ','1953/01/25',73,'男','2025/08/24',0,'090-1940-2647','横浜市戸塚区名瀬町'],
+['000464','佐藤 勇','ｻﾄｳｲｻﾑ','1952/04/28',73,'男','2018/04/01',7,'','横浜市保土ケ谷区帷子町'],
+['000765','佐藤 琢磨','ｻﾄｳﾀｸﾏ','1954/12/24',71,'男','2025/09/16',0,'090-7905-3081','横浜市保土ケ谷区峰沢町'],
+['000737','佐藤 博','ｻﾄｳﾋﾛｼ','1954/09/16',71,'男','2025/03/26',0,'080-3368-8347','横浜市保土ケ谷区仏向町'],
+['000752','佐藤 正利','ｻﾄｳﾏｻﾄｼ','1952/10/01',73,'男','2025/04/10',0,'080-6744-5046','藤沢市亀井野'],
+['000556','佐藤 満雄','ｻﾄｳﾐﾂｵ','1947/10/31',78,'男','2020/05/12',5,'080-7019-9139','鎌倉市腰越'],
+['000484','三戸 敏和','ｻﾝﾉﾍﾄｼｶｽﾞ','1953/06/07',72,'男','2018/09/04',7,'080-4884-6385','横浜市金沢区柳町'],
+['000734','嶋田 悦子','ｼﾏﾀﾞｴﾂｺ','1964/02/28',62,'女','2025/01/04',1,'090-4595-8092','横須賀市上町'],
+['000470','清水 誠','ｼﾐｽﾞﾏｺﾄ','1965/12/27',60,'男','2018/05/14',7,'080-6648-5595','横浜市旭区東希望が丘'],
+['000637','清水 隆','ｼﾐｽﾞﾀｶｼ','1950/11/13',75,'男','2022/06/19',3,'090-5419-5552','横浜市磯子区杉田'],
+['000684','首藤 貴士','ｼｭﾄｳﾀｶｼ','1973/05/26',52,'男','2024/01/25',2,'090-2774-2397','横浜市磯子区田中'],
+['000623','城元 廣','ｼﾞｮｳﾓﾄﾋﾛ','1949/04/14',76,'男','2022/03/08',4,'080-1229-4465','町田市金井ヶ丘'],
+['000013','庄司 健一','ｼｮｳｼﾞｹﾝｲﾁ','1971/09/29',54,'男','1999/02/08',27,'090-4379-6976','横浜市旭区金が谷'],
+['000756','菅野 浩一','ｽｶﾞﾉｺｳｲﾁ','1978/11/23',47,'男','2025/06/24',0,'070-4816-4172','横浜市旭区東希望が丘'],
+['000707','杉本 裕樹','ｽｷﾞﾓﾄﾋﾛｷ','1980/04/13',45,'男','2024/07/23',1,'090-3342-2299','大和市上草柳'],
+['000466','杉山 直也','ｽｷﾞﾔﾏﾅｵﾔ','1988/01/06',38,'男','2018/04/02',7,'080-5401-0838','横浜市旭区笹野台'],
+['000275','杉山 信昭','ｽｷﾞﾔﾏﾉﾌﾞｱｷ','1945/02/09',81,'男','2014/02/02',12,'090-8801-0960','小田原市新屋'],
+['000211','鈴木 政之','ｽｽﾞｷﾏｻﾕｷ','1947/09/20',78,'男','2013/05/07',12,'090-6042-3019','真鶴町真鶴'],
+['000678','鈴木 幸二','ｽｽﾞｷｺｳｼﾞ','1950/12/24',75,'男','2023/12/06',2,'090-1206-4097','横浜市港南区上大岡西'],
+['000573','鈴木 徹','ｽｽﾞｷﾄｵﾙ','1944/10/06',81,'男','2020/10/15',5,'090-5525-6234','横浜市西区東久保町'],
+['000773','鈴木 信明','ｽｽﾞｷﾉﾌﾞｱｷ','1950/07/23',75,'男','2026/02/19',0,'080-1020-2991','横浜市港南区港南'],
+['000006','征矢 純一','ｾｲﾔｼﾞｭﾝｲﾁ','1950/05/19',75,'男','1989/01/26',37,'','横浜市都筑区中川'],
+['000582','関川 弘昭','ｾｷｶﾜﾋﾛｱｷ','1959/04/24',66,'男','2021/02/03',5,'080-3306-5574','横浜市瀬谷区南台'],
+['000560','副島 博之','ｿｴｼﾞﾏﾋﾛﾕｷ','1947/05/04',78,'男','2020/06/08',5,'090-9230-5640','横浜市保土ケ谷区西谷'],
+['000708','高尾 純','ﾀｶｵｼﾞｭﾝ','1952/02/04',74,'男','2024/07/27',1,'090-8347-7889','横浜市青葉区美しが丘西'],
+['000711','高木 昭','ﾀｶｷｱｷﾗ','1996/09/30',29,'男','2024/08/23',1,'070-9307-1139','横須賀市田浦大作町'],
+['000512','髙木 光男','ﾀｶｷﾞﾐﾂｵ','1940/05/02',85,'男','2019/04/01',6,'','横浜市保土ケ谷区岩井町'],
+['000430','髙橋 繁治','ﾀｶﾊｼｼｹﾞﾊﾙ','1949/01/06',77,'男','2017/07/24',8,'','横浜市泉区下和泉'],
+['000541','高橋 康','ﾀｶﾊｼﾔｽｼ','1945/12/12',80,'男','2023/03/22',2,'080-3217-7645','横浜市神奈川区六角橋'],
+['000511','髙山 充弘','ﾀｶﾔﾏﾐﾂﾋﾛ','1938/11/29',87,'男','2019/04/01',6,'090-8892-6607','横浜市保土ケ谷区岩崎町'],
+['000653','田口 三郎','ﾀｸﾞﾁｻﾌﾞﾛｳ','1950/02/03',76,'男','2022/08/02',3,'070-5086-2523','横浜市戸塚区俣野町'],
+['000660','田中 佐己夫','ﾀﾅｶｻｷｵ','1953/03/13',73,'男','2023/03/23',2,'080-6639-9914','横浜市金沢区柴町'],
+['000415','田中 新一','ﾀﾅｶｼﾝｲﾁ','1943/01/01',83,'男','2017/03/29',8,'090-3514-5819','横浜市旭区南希望が丘'],
+['000732','田中 正巳','ﾀﾅｶﾏｻﾐ','1955/10/20',70,'男','2024/12/12',1,'090-1100-1923','横須賀市武'],
+['000676','田中 康夫','ﾀﾅｶﾔｽｵ','1955/08/07',70,'男','2023/12/05',2,'090-3815-3922','横浜市旭区上白根'],
+['000700','千葉 芳則','ﾁﾊﾞﾖｼﾉﾘ','1949/07/05',76,'男','2024/04/26',1,'090-4939-9317','横浜市金沢区釜利谷南'],
+['000725','津田 将誉','ﾂﾀﾞﾏｻﾖｼ','1990/05/03',35,'男','2024/11/01',1,'070-4461-7758','横浜市旭区左近山'],
+['000451','筒井 深','ﾂﾂｲﾌｶｼ','1947/07/23',78,'男','2018/01/11',8,'080-1212-1616','横浜市港南区港南台'],
+['000605','当原 実','ﾄｳﾊﾗﾐﾉﾙ','1957/11/11',68,'男','2021/05/08',4,'080-1342-6836','厚木市愛甲'],
+['000297','冨田 信義','ﾄﾐﾀﾉﾌﾞﾖｼ','1948/03/02',78,'男','2015/08/18',10,'090-2332-0481','座間市南栗原'],
+['000635','中澤 彰','ﾅｶｻﾞﾜｱｷﾗ','1961/08/12',64,'男','2022/05/18',3,'090-1128-7504','横浜市旭区笹野台'],
+['000741','中島 勇','ﾅｶｼﾞﾏﾕｳ','1948/06/11',77,'男','2025/03/27',0,'090-3816-1700','横浜市旭区東希望が丘'],
+['000010','仲野 博文','ﾅｶﾉﾋﾛﾌﾐ','1954/07/23',71,'男','1998/07/28',27,'','横浜市瀬谷区二ツ橋町'],
+['000498','中村 誠','ﾅｶﾑﾗﾏｺﾄ','1966/12/25',59,'男','2019/02/16',7,'090-8710-7607','横須賀市若宮台'],
+['000664','中村 晋','ﾅｶﾑﾗｽｽﾑ','1954/09/14',71,'男','2023/04/03',2,'080-1558-9906','横浜市旭区今宿西町'],
+['000589','中村 友治','ﾅｶﾑﾗﾄﾓｼﾞ','1943/09/25',82,'男','2021/03/28',4,'090-4538-3220','横浜市旭区上白根町'],
+['000674','中村 政行','ﾅｶﾑﾗﾏｻﾕｷ','1949/06/30',76,'男','2023/10/15',2,'080-1006-6717','横浜市南区井土ケ谷下町'],
+['000703','中山 洋治','ﾅｶﾔﾏﾖｳｼﾞ','1953/04/27',72,'男','2024/05/13',1,'090-1798-3428','横浜市神奈川区浦島丘'],
+['000326','南條 俊樹','ﾅﾝｼﾞｮｳｼｭﾝｼﾞｭ','1953/01/02',73,'男','2016/06/01',9,'090-1400-9572','横浜市南区永田台'],
+['000321','西川 正雄','ﾆｼｶﾜﾏｻｵ','1951/09/24',74,'男','2016/04/18',9,'090-4938-5872',''],
+['000482','二宮 康次','ﾆﾉﾐﾔﾔｽﾂｸﾞ','1951/04/11',74,'男','2018/09/04',7,'080-2502-6795','横浜市旭区東希望が丘'],
+['000584','布谷 健二','ﾇﾉﾀﾆｹﾝｼﾞ','1949/12/30',76,'男','2021/02/25',5,'090-2668-6029','横浜市保土ヶ谷区西谷'],
+['000689','林田 健','ﾊﾔｼﾀﾞﾀｹｼ','1943/01/14',83,'男','2024/03/28',1,'090-9801-0570','横浜市戸塚区川上町'],
+['000642','林 俊仁','ﾊﾔｼﾄｼﾋﾄ','1951/09/25',74,'男','2024/04/24',1,'090-4097-9967','平塚市ふじみ野'],
+['000478','鴋澤 邦夫','ﾊﾞﾝｻﾞﾜｸﾆｵ','1955/09/26',70,'男','2018/08/13',7,'090-8107-8142','横浜市港南区下永谷'],
+['000031','平田 直美','ﾋﾗﾀﾅｵﾐ','1964/04/04',61,'女','2004/06/30',21,'090-1798-4171','横浜市旭区東希望が丘'],
+['000558','平館 隆','ﾋﾗﾀﾞﾃﾀｶｼ','1969/12/19',56,'男','2020/05/25',5,'090-3905-6072','大和市下鶴間'],
+['000695','平本 績','ﾋﾗﾓﾄｲｻｵ','1934/08/02',91,'男','2024/04/10',1,'090-7207-0389','横浜市港北区師岡町'],
+['000666','廣瀬 昇','ﾋﾛｾﾉﾎﾞﾙ','1947/11/16',78,'男','2023/04/17',2,'080-8709-3554','横浜市磯子区滝頭'],
+['000744','深山 信雄','ﾌｶﾔﾏﾉﾌﾞｵ','1946/04/19',79,'男','2025/03/30',0,'','横浜市保土ケ谷区法泉'],
+['000503','藤田 昌己','ﾌｼﾞﾀﾏｻｷ','1965/03/11',61,'男','2019/03/25',6,'090-1203-9690','横浜市旭区小高町'],
+['000516','藤平 貞夫','ﾌｼﾞﾋﾗｻﾀﾞｵ','1941/12/28',84,'男','2019/04/12',6,'090-8562-6468','横浜市保土ケ谷区狩場町'],
+['000709','藤原 好文','ﾌｼﾞﾜﾗﾖｼﾌﾐ','1954/07/26',71,'男','2024/08/23',1,'','三浦市初声町'],
+['000289','渕上 妙子','ﾌﾁｶﾞﾐﾀｴｺ','1949/03/21',76,'女','2015/06/22',10,'080-3902-9090','平塚市桃浜町'],
+['000630','古矢 正孝','ﾌﾙﾔﾏｻﾀｶ','1954/08/08',71,'男','2022/04/21',3,'080-4329-8822','横浜市緑区三保町'],
+['000041','北條 勲','ﾎｳｼﾞｮｳｲｻｵ','1970/07/02',55,'男','2006/06/12',19,'090-1116-6465','横浜市磯子区丸山'],
+['000658','毎原 良三','ﾏｲﾊﾗﾘｮｳｿﾞｳ','1939/04/19',86,'男','2023/03/12',3,'090-2568-5868','茅ヶ崎市下町屋'],
+['000742','前田 正人','ﾏｴﾀﾞﾏｻﾄ','1953/05/25',72,'男','2025/03/30',0,'090-6376-4521','横浜市緑区台村町'],
+['000570','益田 広人','ﾏｽﾀﾞﾋﾛﾄ','1960/01/18',66,'男','2020/09/28',5,'090-4458-0456','三浦市原町'],
+['000738','松嶋 利明','ﾏﾂｼﾏﾄｼｱｷ','1956/01/04',70,'男','2025/03/26',0,'090-5806-8903','横浜市瀬谷区阿久和西'],
+['000610','松本 昇','ﾏﾂﾓﾄﾉﾎﾞﾙ','1953/08/05',72,'男','2021/05/26',4,'080-5410-0805','平塚市入野'],
+['000600','真弓 貴之','ﾏﾕﾐﾀｶｼ','1953/04/16',72,'男','2021/04/15',4,'080-5538-2416','厚木市戸室'],
+['000480','三浦 功二郎','ﾐｳﾗｺｳｼﾞﾛｳ','1941/12/07',84,'男','2022/11/24',3,'090-4131-8326','横浜市旭区東希望が丘'],
+['000685','三浦 正一','ﾐｳﾗｼｮｳｲﾁ','1961/06/24',64,'男','2024/01/25',2,'090-4452-3577','鎌倉市大船'],
+['000567','水田 敏樹','ﾐｽﾞﾀﾄｼｷ','1961/06/05',64,'男','2020/08/24',5,'080-6684-0088','横浜市西区北軽井沢'],
+['000263','溝口 重信','ﾐｿﾞｸﾞﾁｼｹﾞﾉﾌﾞ','1968/03/09',58,'男','2024/11/12',1,'090-4930-9706','横浜市旭区中希望が丘'],
+['000740','溝渕 修三','ﾐｿﾞﾌﾁｼｭｳｿﾞｳ','1959/05/13',66,'男','2025/03/26',0,'090-2632-2566','平塚市代官町'],
+['000691','三嘴 誠八郎','ﾐﾂﾊｼｾｲﾊﾁﾛｳ','1945/01/27',81,'男','2024/04/06',1,'090-1763-3831','横浜市中区矢口台'],
+['000751','宮崎 稔夫','ﾐﾔｻﾞｷﾄｼｵ','1961/08/04',64,'男','2025/04/10',0,'090-2165-7604','横浜市南区大岡'],
+['000713','村田 賢次','ﾑﾗﾀｹﾝｼﾞ','1942/09/22',83,'男','2024/09/08',1,'070-9043-3829','横浜市港南区笹下'],
+['000476','望月 正美','ﾓﾁｽﾞｷﾏｻﾐ','1948/03/12',78,'男','2018/07/23',7,'','横浜市保土ヶ谷区岩井町'],
+['000290','桃井 駿介','ﾓﾓｲｼｭﾝｽｹ','1946/10/26',79,'男','2015/07/08',10,'080-3704-9883','大和市下鶴間'],
+['000038','森 隆','ﾓﾘﾀｶｼ','1984/09/02',41,'男','2005/04/11',20,'080-1801-8221','横浜市旭区東希望が丘'],
+['000266','屋形 道義','ﾔｶﾀﾐﾁﾖｼ','1946/12/25',79,'男','2014/09/04',11,'090-1252-6401','横浜市南区中村町'],
+['000718','矢代 正行','ﾔｼﾛﾏｻﾕｷ','1948/07/24',77,'男','2024/09/13',1,'080-5541-8375','横須賀市平作'],
+['000754','安田 敏之','ﾔｽﾀﾞﾄｼﾕｷ','1958/12/15',67,'男','2025/04/30',0,'080-1239-9162','横浜市瀬谷区二ツ橋町'],
+['000727','梁川 昌弘','ﾔﾅｶﾞﾜﾏｻﾋﾛ','1964/10/05',61,'男','2024/11/13',1,'080-5909-2758','相模原市南区南台'],
+['000768','矢吹 省三','ﾔﾌﾞｷｼｮｳｿﾞｳ','1949/02/23',77,'男','2025/11/28',0,'090-7259-1658','横浜市瀬谷区阿久和東'],
+['000729','山口 和秀','ﾔﾏｸﾞﾁｶｽﾞﾋﾃﾞ','1954/05/24',71,'男','2024/11/22',1,'090-2750-8737','横須賀市阿部倉'],
+['000312','山下谷 幸一','ﾔﾏｼﾀﾔｺｳｲﾁ','1950/12/09',75,'男','2016/03/01',10,'080-3250-2324','大和市中央'],
+['000096','山本 茂','ﾔﾏﾓﾄｼｹﾞﾙ','1942/06/16',83,'男','2011/05/25',14,'090-6501-1665','海老名市東柏ケ谷'],
+['000548','山本 信秀','ﾔﾏﾓﾄﾉﾌﾞﾋﾃﾞ','1946/12/16',79,'男','2020/04/01',5,'090-2252-4567','横浜市保土ケ谷区川辺町'],
+['000595','横田 賢英','ﾖｺﾀﾏｻﾋﾃﾞ','1969/08/06',56,'男','2021/04/07',4,'080-6886-9159','横浜市神奈川区三ツ沢下町'],
+['000004','横溝 栄司','ﾖｺﾐｿﾞｴｲｼﾞ','1963/10/06',62,'男','1988/08/29',37,'090-7216-8482','横浜市泉区和泉町'],
+['000621','吉澤 洋治','ﾖｼｻﾞﾜﾖｳｼﾞ','1946/10/10',79,'男','2022/01/16',4,'090-4678-9805','座間市緑ケ丘'],
+['000686','吉田 昇二','ﾖｼﾀﾞｼｮｳｼﾞ','1943/11/09',82,'男','2023/03/01',3,'080-6439-6103','横浜市保土ケ谷区新井町'],
+['000571','若林 誠治','ﾜｶﾊﾞﾔｼｾｲｼﾞ','1950/02/25',76,'男','2020/09/28',5,'070-5450-4762','横浜市旭区さちが丘'],
+['000510','渡辺 信雄','ﾜﾀﾅﾍﾞﾉﾌﾞｵ','1944/04/11',81,'男','2019/03/18',7,'090-6489-7596','横浜市保土ケ谷区川島町'],
+['000440','綿貫 茂','ﾜﾀﾇｷｼｹﾞﾙ','1948/11/01',77,'男','2017/10/16',8,'090-4701-0373','横浜市旭区西川島町'],
+];
+
+// Build staff objects
+let staffMap = {};
+const staff = STAFF_RAW.map((r,i)=>{
+  const s = {
+    id: r[0], name: r[1], kana: r[2], birth: r[3], age: r[4],
+    sex: r[5], joinDate: r[6], exp: r[7], tel: r[8], addr: r[9],
+    color: COLORS[i % COLORS.length],
+    qual: 'general', // 'general' | 'qualified' | 'certified' — 隊員詳細で変更可
+    active: true
+  };
+  staffMap[s.id] = s;
+  return s;
+});
+let nextStaffId = 2000;
+
+// Sites
+let sites = [
+  {id:1, name:'三渓園', client:'公益財団法人三渓園保勝会', time:'08:00～17:00', need:1, shift:'day', qual:'general', guard:'1', contract:'permanent', activeDays:[1,2,3,4,5], collapsed:false},
+  {id:2, name:'大和公園', client:'大和市', time:'09:00～18:00', need:1, shift:'day', qual:'general', guard:'1', contract:'spot', activeDays:[], collapsed:false},
+  {id:3, name:'戸塚平戸', client:'戸塚平戸', time:'08:00～17:00', need:1, shift:'day', qual:'general', guard:'1', contract:'permanent', activeDays:[1,2,3,4,5,6], collapsed:false},
+  {id:4, name:'肉のハナマサ', client:'㈱花正', time:'09:00～22:00', need:1, shift:'night', qual:'general', guard:'1', contract:'regular', activeDays:[1,2,3,4,5], collapsed:false},
+  {id:5, name:'JAF', client:'一般社団法人JAF', time:'08:00～20:00', need:2, shift:'night', qual:'certified', guard:'2', contract:'spot', activeDays:[], collapsed:false},
+  {id:6, name:'大成建設㈱', client:'大成建設㈱', time:'08:00～17:00', need:1, shift:'day', qual:'qualified', guard:'1', contract:'regular', activeDays:[1,2,3,4,5], collapsed:false},
+  {id:7, name:'長谷工コーポレーション', client:'㈱長谷工コーポレーション', time:'08:00～17:00', need:1, shift:'day', qual:'qualified', guard:'1', contract:'permanent', activeDays:[1,2,3,4,5], collapsed:false},
+  {id:8, name:'横浜祭典', client:'横浜祭典㈱', time:'09:00～17:00', need:2, shift:'day', qual:'general', guard:'2', contract:'spot', activeDays:[], collapsed:false},
+  {id:9, name:'緑の協会', client:'公益財団法人緑の協会', time:'09:00～17:00', need:1, shift:'day', qual:'general', guard:'1', contract:'regular', activeDays:[1,2,3,4,5,6], collapsed:false},
+];
+let nextSiteId = 100;
+
+let assignments = {};  // key: siteId_date → [staffId,...]
+let leaves = [];       // {staffId, start, end, reason}
+let checks = {};       // key: siteId_date → bool
+let okStatus = {};     // key: siteId_date_staffId → '' | 'pre' | 'day'
+let cancels = {};      // 現場キャンセル: key siteId_date → true  /  隊員キャンセル: siteId_date_staffId → true
+let memos = {};        // key: siteId_date → string
+let changeLogs = [];   // 変更ログ [{ts, operator, action, detail}]
+let currentOperator = localStorage.getItem('operator') || '';
+let dragging = null;
+let sbFilter = 'all';
+
+function addLog(action, detail){
+  changeLogs.unshift({
+    ts: new Date().toLocaleString('ja-JP'),
+    operator: currentOperator || '（未設定）',
+    action, detail
+  });
+  if(changeLogs.length > 500) changeLogs.pop(); // 上限500件
+}
+
+// ===== 日本の祝日データ（2025〜2027） =====
+const HOLIDAYS = new Set([
+  // 2025
+  '2025-01-01','2025-01-13','2025-02-11','2025-02-23','2025-02-24',
+  '2025-03-20','2025-04-29','2025-05-03','2025-05-04','2025-05-05','2025-05-06',
+  '2025-07-21','2025-08-11','2025-09-15','2025-09-22','2025-09-23',
+  '2025-10-13','2025-11-03','2025-11-23','2025-11-24',
+  // 2026
+  '2026-01-01','2026-01-12','2026-02-11','2026-02-23',
+  '2026-03-20','2026-04-29','2026-05-03','2026-05-04','2026-05-05','2026-05-06',
+  '2026-07-20','2026-08-11','2026-09-21','2026-09-22','2026-09-23',
+  '2026-10-12','2026-11-03','2026-11-23',
+  // 2027
+  '2027-01-01','2027-01-11','2027-02-11','2027-02-23',
+  '2027-03-21','2027-04-29','2027-05-03','2027-05-04','2027-05-05',
+  '2027-07-19','2027-08-11','2027-09-20','2027-09-23',
+  '2027-10-11','2027-11-03','2027-11-23',
+]);
+const isHoliday = (dateStr) => HOLIDAYS.has(dateStr);
+const isHolidayOrWeekend = (dateStr, dayOfWeekNum) => dayOfWeekNum===0 || dayOfWeekNum===6 || isHoliday(dateStr);
+let curYear = new Date().getFullYear();
+let curMonth = new Date().getMonth();
+
+const toKey = (y,m,d) => `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+const aKey = (sid,date) => `${sid}_${date}`;
+const daysIn = (y,m) => new Date(y,m+1,0).getDate();
+const dow = (y,m,d) => new Date(y,m,d).getDay();
+const DAYS = ['日','月','火','水','木','金','土'];
+
+function isOnLeave(staffId, dateStr){
+  return leaves.some(l => l.staffId===staffId && l.start<=dateStr && dateStr<=l.end);
+}
+function getAssigned(siteId, dateStr){
+  return assignments[aKey(siteId,dateStr)] || [];
+}
+
+// ===== STAFF SIDEBAR =====
+function setFilter(f){
+  sbFilter = f;
+  ['all','avail','female'].forEach(x=>{
+    const el = document.getElementById('fc-'+x);
+    if(el) el.classList.toggle('active', x===f);
+  });
+  renderSb();
+}
+
+function renderSb(){
+  const q = document.getElementById('staffSearch').value.toLowerCase();
+  const today = toKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+  
+  let list = staff;
+  if(q) list = list.filter(s => s.name.includes(q)||s.kana.toLowerCase().includes(q));
+  if(sbFilter==='avail') list = list.filter(s => !isOnLeave(s.id, today));
+  if(sbFilter==='female') list = list.filter(s => s.sex==='女');
+  
+  document.getElementById('sb-count').textContent = `隊員 ${list.length}名`;
+  
+  const el = document.getElementById('staffList');
+  el.innerHTML = '';
+  list.forEach(s => {
+    const onLeave = isOnLeave(s.id, today);
+    const d = document.createElement('div');
+    d.className = 'sc' + (onLeave ? ' on-leave' : '');
+    d.draggable = !onLeave;
+    d.dataset.id = s.id;
+    d.innerHTML = `
+      <div class="av" style="background:${s.color}">${s.name[0]}</div>
+      <div class="si">
+        <div class="sn">${s.name}</div>
+        <div class="sq">${onLeave?'🏖休み':'経験'+s.exp+'年・'+s.age+'歳'}</div>
+      </div>
+      <div class="sd ${onLeave?'d-off':'d-ok'}"></div>`;
+    
+    d.addEventListener('dragstart', e => {
+      if(onLeave){e.preventDefault();return;}
+      dragging = s;
+      d.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', s.id);
+      const g = document.getElementById('drag-ghost');
+      g.textContent = s.name;
+      g.style.display = 'block';
+    });
+    d.addEventListener('dragend', () => {
+      d.classList.remove('dragging');
+      document.getElementById('drag-ghost').style.display = 'none';
+      dragging = null;
+    });
+    d.addEventListener('click', () => showDetail(s));
+    el.appendChild(d);
+  });
+}
+
+document.addEventListener('mousemove', e => {
+  const g = document.getElementById('drag-ghost');
+  if(g.style.display==='block'){
+    g.style.left = e.clientX+'px';
+    g.style.top = e.clientY+'px';
+  }
+});
+
+// ===== DETAIL PANEL =====
+function showDetail(s){
+  const p = document.getElementById('detailPanel');
+  document.getElementById('detailContent').innerHTML = `
+    <div class="dp-avatar" style="background:${s.color}">${s.name[0]}</div>
+    <div class="dp-name">${s.name}</div>
+    <div class="dp-kana">${s.kana}</div>
+    <hr class="dp-divider">
+    <div class="dp-row"><span class="dp-key">コード</span><span class="dp-val">${s.id}</span></div>
+    <div class="dp-row"><span class="dp-key">性別</span><span class="dp-val">${s.sex}</span></div>
+    <div class="dp-row"><span class="dp-key">生年月日</span><span class="dp-val">${s.birth}（${s.age}歳）</span></div>
+    <div class="dp-row"><span class="dp-key">入社日</span><span class="dp-val">${s.joinDate}</span></div>
+    <div class="dp-row"><span class="dp-key">経験年数</span><span class="dp-val">${s.exp}年</span></div>
+    <div class="dp-row"><span class="dp-key">携帯</span><span class="dp-val">${s.tel||'—'}</span></div>
+    <div class="dp-row"><span class="dp-key">住所</span><span class="dp-val">${s.addr||'—'}</span></div>
+    <div class="dp-row" style="align-items:center">
+      <span class="dp-key">資格区分</span>
+      <select style="border:1.5px solid #ddd;border-radius:6px;padding:4px 8px;font-family:inherit;font-size:11px;outline:none;flex:1"
+        onchange="updateStaffQual('${s.id}',this.value)">
+        <option value="general" ${(s.qual||'general')==='general'?'selected':''}>一般（無資格）</option>
+        <option value="qualified" ${s.qual==='qualified'?'selected':''}>有資格者</option>
+        <option value="certified" ${s.qual==='certified'?'selected':''}>検定合格者</option>
+      </select>
+    </div>
+    <hr class="dp-divider">
+    <div style="font-size:10px;font-weight:700;color:var(--ink3);margin-bottom:6px;letter-spacing:.1em">休み登録</div>
+    ${leaves.filter(l=>l.staffId===s.id).map(l=>`
+      <div style="background:var(--gray);border-radius:6px;padding:6px 8px;margin-bottom:4px;font-size:11px;display:flex;justify-content:space-between;align-items:center">
+        <span>${l.start}〜${l.end}</span>
+        <span style="background:#fff3cd;padding:1px 6px;border-radius:4px;font-size:10px">${l.reason}</span>
+        <button style="background:none;border:none;cursor:pointer;color:var(--red);font-size:12px" onclick="removeLeave('${s.id}','${l.start}','${l.end}')">✕</button>
+      </div>`).join('')||'<div style="font-size:11px;color:var(--ink3);margin-bottom:10px">登録なし</div>'}
+    <hr class="dp-divider">
+    <button class="btn btn-r" style="width:100%;justify-content:center" onclick="deleteStaff('${s.id}')">🗑 削除する</button>
+  `;
+  p.classList.add('open');
+}
+
+function deleteStaff(staffId){
+  const s = staffMap[staffId];
+  if(!s) return;
+  if(!confirm(`「${s.name}」を完全に削除します。\nこの操作は元に戻せません。\n本当に削除しますか？`)) return;
+  const idx = staff.findIndex(x => x.id === staffId);
+  if(idx !== -1) staff.splice(idx, 1);
+  delete staffMap[staffId];
+  leaves = leaves.filter(l => l.staffId !== staffId);
+  Object.keys(assignments).forEach(k => {
+    assignments[k] = assignments[k].filter(id => id !== staffId);
+  });
+  closeDetail();
+  toast(`${s.name} を完全削除しました`, 'ok');
+  render();
+}
+
+function closeDetail(){
+  document.getElementById('detailPanel').classList.remove('open');
+}
+
+function updateStaffQual(staffId, val){
+  const s = staffMap[staffId];
+  if(!s) return;
+  s.qual = val;
+  const label = val==='qualified'?'有資格者':val==='certified'?'検定合格者':'一般';
+  toast(`${s.name} の資格区分を「${label}」に変更しました`, 'ok');
+  renderWb(); // セル内のカウントを即更新
+}
+
+function removeLeave(staffId, start, end){
+  leaves = leaves.filter(l => !(l.staffId===staffId && l.start===start && l.end===end));
+  render();
+  // refresh detail
+  const s = staffMap[staffId];
+  if(s) showDetail(s);
+}
+
+// ===== WHITEBOARD =====
+function renderWb(){
+  const {y,m} = {y:curYear, m:curMonth};
+  const days = daysIn(y,m);
+  const today = toKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+  const colTpl = `200px repeat(${days},minmax(72px,1fr)) 56px`;
+  
+  let html = `<div class="cal-hd" style="grid-template-columns:${colTpl}">
+    <div class="ch" style="text-align:left;padding-left:10px;font-size:10px">現場 / 時間</div>`;
+  
+  for(let d=1;d<=days;d++){
+    const dw = dow(y,m,d);
+    const ds = toKey(y,m,d);
+    const hol = isHoliday(ds);
+    const cls = ds===today?'tod':hol||dw===0?'sun':dw===6?'sat':'';
+    const holMark = hol && dw!==0 ? `<div class="hol-mark">祝</div>` : '';
+    html+=`<div class="ch ${cls}"><div class="cd">${d}</div><div class="cday">${DAYS[dw]}</div>${holMark}</div>`;
+  }
+  html += `<div class="ch" style="font-size:8px;line-height:1.4;padding:4px 2px;text-align:center">OK<br>確認</div></div>`;
+  
+  sites.forEach((site,siteIdx) => {
+    const sc = site.shift==='night'?'s-night':site.shift==='day'?'s-day':'s-other';
+    const badgeCls = site.shift==='night'?'shift-night':site.shift==='day'?'shift-day':'shift-other';
+    const badgeTxt = site.shift==='night'?'🌙 夜勤':site.shift==='day'?'☀️ 日勤':'—';
+    const guardNum = site.guard||'1';
+    const guardLabel = ['','施設','交通','輸送','身辺'][parseInt(guardNum)]||guardNum;
+    const qualLabel = site.qual==='qualified'?'有資格者':site.qual==='certified'?'検定合格者':'一般';
+    const contractCls = {permanent:'contract-permanent',regular:'contract-regular',spot:'contract-spot',term:'contract-term'}[site.contract]||'contract-spot';
+    const contractTxt = {permanent:'常駐',regular:'定期',spot:'スポット',term:'期限付き'}[site.contract]||'スポット';
+
+    // 期限付き: 残日数・期限切れ判定
+    let termInfo = '';
+    let isExpired = false;
+    if(site.contract==='term' && site.termEnd){
+      const todayMs = new Date(today).getTime();
+      const endMs   = new Date(site.termEnd).getTime();
+      const daysLeft = Math.ceil((endMs - todayMs) / 86400000);
+      if(daysLeft < 0){
+        isExpired = true;
+        // 期限切れなら自動折りたたみ
+        if(!site.collapsed) site.collapsed = true;
+        termInfo = `<span class="expiry-warn">⚠️ 期限切れ</span>`;
+      } else if(daysLeft <= 7){
+        termInfo = `<span class="expiry-warn">🔔 残${daysLeft}日</span>`;
+      } else {
+        termInfo = `<span style="font-size:9px;color:var(--ink3)">〜${site.termEnd}</span>`;
+      }
+    }
+    if(site.contract==='term' && site.termStart){
+      const todayMs = new Date(today).getTime();
+      const startMs = new Date(site.termStart).getTime();
+      if(todayMs < startMs && !site.collapsed) site.collapsed = false; // 開始前は展開
+    }
+
+    // 今月の有資格者配置人数（ユニーク）
+    const qualifiedThisMonth = new Set();
+    for(let d=1; d<=days; d++){
+      const ds2 = toKey(y,m,d);
+      getAssigned(site.id, ds2).forEach(sid=>{
+        if(staffMap[sid]) qualifiedThisMonth.add(sid); // 全配置隊員（資格フィールドなし→全員カウント対象）
+      });
+    }
+    // 現在の表示月のユニーク配置人数
+    const uniqAssignedThisMonth = qualifiedThisMonth.size;
+
+    const collapsedCls = site.collapsed ? 'collapsed' : '';
+    const expiredCls   = isExpired ? 'expired' : '';
+
+    html += `<div class="site-row ${sc} ${collapsedCls} ${expiredCls}" style="grid-template-columns:${colTpl}" data-siteidx="${siteIdx}"
+      ondragover="siteRowOver(event,${siteIdx})"
+      ondragleave="siteRowLeave(event)"
+      ondrop="siteRowDrop(event,${siteIdx})">
+      <div class="sl">
+        <div class="sl-inner">
+          <div class="sl-handle" draggable="true"
+            ondragstart="siteRowDragStart(event,${siteIdx})"
+            ondragend="siteRowDragEnd(event)"
+            title="ドラッグして並べ替え">⋮⋮</div>
+          <div style="min-width:0;flex:1">
+            <div style="display:flex;align-items:center;gap:4px;margin-bottom:1px;flex-wrap:wrap">
+              <span class="contract-badge ${contractCls}">${contractTxt}</span>
+              ${termInfo}
+              ${site.client?`<span class="site-client" style="margin-bottom:0" title="${site.client}">🏢 ${site.client}</span>`:''}
+            </div>
+            <div class="sln" title="${site.name}">${site.name}</div>
+            <div class="slt">${site.time}${site.contract==='term'&&site.termStart?` ／ ${site.termStart}〜${site.termEnd||''}`:''}</div>
+            <div style="display:flex;align-items:center;gap:3px;margin-top:4px;flex-wrap:wrap">
+              <span class="shift-badge ${badgeCls}">${badgeTxt}</span>
+              <span class="guard-badge guard-${guardNum}">${guardNum}号・${guardLabel}</span>
+              <span class="qual-badge qual-${site.qual||'general'}">${qualLabel}${site.qual!=='general'?` 必要`:''}</span>
+              <span class="nbadge">必要 ${site.need}名</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:3px;margin-top:3px">
+              <button class="collapse-btn" onclick="toggleCollapse(${site.id})" title="${site.collapsed?'展開':'折りたたむ'}">${site.collapsed?'▶':'▼'}</button>
+              <button class="sl-btn sl-edit" onclick="openEditSite(${site.id})" title="編集">✏️</button>
+              <button class="sl-btn sl-del" onclick="deleteSite(${site.id})" title="削除">🗑</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    
+    for(let d=1;d<=days;d++){
+      const dw = dow(y,m,d);
+      const ds = toKey(y,m,d);
+      const isActive = (() => {
+        if(site.contract==='spot') return getAssigned(site.id,ds).length > 0;
+        if(site.contract==='term'){
+          const inRange = (!site.termStart || ds >= site.termStart) && (!site.termEnd || ds <= site.termEnd);
+          if(!inRange) return false;
+          if((site.activeDays||[]).length > 0){
+            // 祝日は日曜扱いで判定
+            const effectiveDow = isHoliday(ds) ? 0 : dw;
+            return site.activeDays.includes(effectiveDow);
+          }
+          return true;
+        }
+        if((site.activeDays||[]).length===0) return true;
+        // 祝日は日曜扱い
+        const effectiveDow = isHoliday(ds) ? 0 : dw;
+        return site.activeDays.includes(effectiveDow);
+      })();
+      const inactiveCls = !isActive ? 'inactive' : '';
+      const hol = isHoliday(ds);
+      const holCls = hol && dw!==0 && dw!==6 ? 'hol' : '';  // 土日以外の祝日
+      const cls = ds===today?'tod':hol||dw===0?'sun':dw===6?'sat':'';
+      const siteCancelKey = `${site.id}_${ds}`;
+      const isSiteCancelled = !!cancels[siteCancelKey];
+      const cancelledCls = isSiteCancelled ? 'cancelled' : '';
+      const asgn = getAssigned(site.id, ds);
+      
+      // キャンセルバナーと解除ボタン
+      let cancelBanner = '';
+      if(isSiteCancelled){
+        cancelBanner = `<div class="cancel-banner">🚫 中止</div>
+          <button class="cancel-btn undo" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();undoSiteCancel(${site.id},'${ds}')">↩ 解除</button>`;
+      } else if(isActive) {
+        cancelBanner = `<button class="cancel-btn" style="opacity:0;pointer-events:none" id="cb-${site.id}-${ds}"
+          onmousedown="event.stopPropagation()" onclick="event.stopPropagation();cancelSite(${site.id},'${ds}')">🚫 中止</button>`;
+      }
+
+      let inner = cancelBanner;
+      inner += asgn.map(sid => {
+        const s = staffMap[sid]; if(!s) return '';
+        const okKey = `${site.id}_${ds}_${sid}`;
+        const ok = okStatus[okKey] || '';
+        const okCls = ok==='pre'?'ok-pre':ok==='day'?'ok-day':'';
+        const okTxt = ok==='pre'?'黒OK':ok==='day'?'赤OK':'OK?';
+        const staffCancelKey = `${site.id}_${ds}_${sid}_c`;
+        const isStaffCancelled = !!cancels[staffCancelKey];
+        const staffCancelledCls = isStaffCancelled ? 'staff-cancelled' : '';
+        const staffCancelBtn = isStaffCancelled
+          ? `<button class="cancel-btn undo" style="font-size:9px;padding:1px 4px" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();undoStaffCancel(${site.id},'${ds}','${sid}')">↩</button>`
+          : `<button class="cancel-btn" style="font-size:9px;padding:1px 4px" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();cancelStaff(${site.id},'${ds}','${sid}')">中止</button>`;
+        const staffMemoKey = `${site.id}_${ds}_${sid}_m`;
+        const staffMemo = memos[staffMemoKey] || '';
+        return `<div class="asgn ${staffCancelledCls}" style="border-color:${s.color}40;background:${s.color}15">
+          <div class="asgn-top">
+            <div class="asgn-dot" style="background:${s.color}"></div>
+            <span class="asgn-name" style="color:${s.color}">${s.name}</span>
+          </div>
+          ${!isStaffCancelled ? `<div class="asgn-actions">
+            <span class="ok-badge ${okCls}"
+              onmousedown="event.stopPropagation()"
+              onclick="event.stopPropagation();cycleOk('${okKey}')">${okTxt}</span>
+            <button class="cancel-btn" style="font-size:9px;padding:1px 4px" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();cancelStaff(${site.id},'${ds}','${sid}')">中止</button>
+            <button class="staff-memo-btn" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();toggleStaffMemo('smemo-${site.id}-${ds}-${sid}')" title="メモ">📝</button>
+          </div>` : `<div class="asgn-actions">
+            <button class="cancel-btn undo" style="font-size:9px;padding:1px 4px" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();undoStaffCancel(${site.id},'${ds}','${sid}')">↩ 解除</button>
+          </div>`}
+          <div id="smemo-${site.id}-${ds}-${sid}" class="staff-memo-area" style="display:${staffMemo?'block':'none'}">
+            <div class="staff-memo-input"
+              contenteditable="true"
+              onmousedown="event.stopPropagation()"
+              onclick="event.stopPropagation()"
+              onblur="saveStaffMemo('${staffMemoKey}',this)"
+              onkeydown="if(event.key==='Escape')this.blur()"
+              data-placeholder="メモを入力..."
+            >${escHtml(staffMemo)}</div>
+          </div>
+          <div class="rx" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();removeA(${site.id},'${ds}','${sid}')">✕</div>
+        </div>`;
+      }).join('');
+      
+      // 有資格者カウント（現場が有資格者必須の場合に表示）
+      const qualifiedCount = asgn.filter(sid => {
+        const st = staffMap[sid];
+        return st && (st.qual==='qualified' || st.qual==='certified');
+      }).length;
+      const needsQual = site.qual !== 'general';
+      const qualOk = !needsQual || qualifiedCount >= 1;
+      if(asgn.length < site.need && !isSiteCancelled) inner += `<div style="font-size:9px;color:#bbb;text-align:center;padding-top:1px">${asgn.length}/${site.need}</div>`;
+      if(needsQual && asgn.length > 0 && !isSiteCancelled){
+        inner += `<div style="font-size:9px;font-weight:700;text-align:center;padding-top:1px;color:${qualOk?'#6a1b9a':'#c0392b'}">
+          ${qualOk?'✓':'⚠'} 有資格 ${qualifiedCount}名
+        </div>`;
+      }
+      
+      // メモ表示
+      const memoKey = `${site.id}_${ds}`;
+      const memoTxt = memos[memoKey] || '';
+      if(memoTxt){
+        inner += `<div class="memo-chip" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();openMemo(${site.id},'${ds}')">
+          <span class="memo-icon">📝</span>
+          <span>${memoTxt.length>30?memoTxt.slice(0,30)+'…':memoTxt}</span>
+        </div>`;
+      } else if(isActive && !isSiteCancelled){
+        inner += `<button class="memo-add-btn" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();openMemo(${site.id},'${ds}')">＋ メモ</button>`;
+      }
+
+      html += `<div class="dc ${cls} ${holCls} ${inactiveCls} ${cancelledCls}" data-site="${site.id}" data-date="${ds}"
+        ondragover="dragOver(event)" ondrop="drop(event,${site.id},'${ds}')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondblclick="openMemo(${site.id},'${ds}')"
+        onmouseenter="showCancelBtn('cb-${site.id}-${ds}')"
+        onmouseleave="hideCancelBtn('cb-${site.id}-${ds}')">${inner}</div>`;
+    }
+    
+    // 行末：今日のOK状況サマリー
+    const todayAsgn = getAssigned(site.id, today);
+    const totalToday = todayAsgn.length;
+    const okCount = todayAsgn.filter(sid => {
+      const k = `${site.id}_${today}_${sid}`;
+      return okStatus[k] === 'pre' || okStatus[k] === 'day';
+    }).length;
+    const allOk = totalToday > 0 && okCount === totalToday;
+    html += `<div class="cc">
+      <div style="font-size:9px;font-weight:700;color:${allOk?'#28a745':totalToday===0?'#ccc':'#aaa'};text-align:center;line-height:1.3">
+        ${totalToday===0?'—':`${okCount}/${totalToday}`}
+      </div>
+      <div class="cklbl" style="margin-top:2px">今日<br>OK</div>
+    </div></div>`;
+  });
+  
+  document.getElementById('wb').innerHTML = html;
+}
+
+function toggleCollapse(siteId){
+  const s = sites.find(x=>x.id===siteId);
+  if(!s) return;
+  s.collapsed = !s.collapsed;
+  renderWb();
+}
+
+// ===== キャンセル =====
+function cancelSite(siteId, dateStr){
+  const site = sites.find(x=>x.id===siteId);
+  if(!confirm(`「${site?.name}」${dateStr} を中止にしますか？\n配置済みの隊員は解放されます（記録は残ります）`)) return;
+  cancels[`${siteId}_${dateStr}`] = true;
+  addLog('現場中止', `${dateStr} ／ ${site?.name} → 中止`);
+  renderWb();
+  toast(`「${site?.name}」${dateStr} を中止にしました`, 'ok');
+}
+
+function undoSiteCancel(siteId, dateStr){
+  delete cancels[`${siteId}_${dateStr}`];
+  const site = sites.find(x=>x.id===siteId);
+  addLog('中止解除', `${dateStr} ／ ${site?.name} → 中止を解除`);
+  renderWb();
+  toast('中止を解除しました', 'ok');
+}
+
+function cancelStaff(siteId, dateStr, staffId){
+  const s = staffMap[staffId];
+  const site = sites.find(x=>x.id===siteId);
+  cancels[`${siteId}_${dateStr}_${staffId}_c`] = true;
+  addLog('隊員中止', `${dateStr} ／ ${site?.name} ／ ${s?.name} → 中止`);
+  renderWb();
+  toast(`${s?.name} を中止にしました（記録に残ります）`, 'ok');
+}
+
+function undoStaffCancel(siteId, dateStr, staffId){
+  delete cancels[`${siteId}_${dateStr}_${staffId}_c`];
+  const s = staffMap[staffId];
+  addLog('隊員中止解除', `${dateStr} ／ ${s?.name} → 中止を解除`);
+  renderWb();
+  toast(`${s?.name} の中止を解除しました`, 'ok');
+}
+
+function showCancelBtn(id){ const el=document.getElementById(id); if(el){el.style.opacity='1';el.style.pointerEvents='auto';} }
+function hideCancelBtn(id){ const el=document.getElementById(id); if(el){el.style.opacity='0';el.style.pointerEvents='none';} }
+
+// ===== メモ =====
+let _memoEditKey = '';
+
+function openMemo(siteId, dateStr){
+  const site = sites.find(x=>x.id===siteId);
+  _memoEditKey = `${siteId}_${dateStr}`;
+  document.getElementById('memo-modal-title').textContent = `📝 メモ — ${site?.name} ${dateStr}`;
+  document.getElementById('memo-text').value = memos[_memoEditKey] || '';
+  document.getElementById('mo-memo').classList.add('open');
+  setTimeout(()=>document.getElementById('memo-text').focus(), 100);
+}
+
+function saveMemo(){
+  const txt = document.getElementById('memo-text').value.trim();
+  if(txt){
+    memos[_memoEditKey] = txt;
+    const [siteId, date] = _memoEditKey.split('_');
+    const site = sites.find(x=>x.id===parseInt(siteId));
+    addLog('メモ更新', `${date} ／ ${site?.name||siteId} → 「${txt.slice(0,30)}${txt.length>30?'…':''}」`);
+  } else {
+    delete memos[_memoEditKey];
+  }
+  closeMo('memo');
+  renderWb();
+}
+
+function clearMemo(){
+  delete memos[_memoEditKey];
+  const [siteId, date] = _memoEditKey.split('_');
+  const site = sites.find(x=>x.id===parseInt(siteId));
+  addLog('メモ削除', `${date} ／ ${site?.name||siteId}`);
+  closeMo('memo');
+  renderWb();
+}
+
+// 隊員カードのインラインメモ
+function toggleStaffMemo(elemId){
+  const el = document.getElementById(elemId);
+  if(!el) return;
+  const isVisible = el.style.display !== 'none';
+  el.style.display = isVisible ? 'none' : 'block';
+  if(!isVisible){
+    const input = el.querySelector('.staff-memo-input');
+    if(input) setTimeout(()=>{ input.focus(); placeCaretAtEnd(input); }, 50);
+  }
+}
+
+function placeCaretAtEnd(el){
+  const range = document.createRange();
+  const sel = window.getSelection();
+  range.selectNodeContents(el);
+  range.collapse(false);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+function saveStaffMemo(key, el){
+  const txt = el.innerText.trim();
+  if(txt){
+    const wasNew = !memos[key];
+    memos[key] = txt;
+    if(wasNew){
+      const parts = key.split('_');
+      const site = sites.find(x=>x.id===parseInt(parts[0]));
+      const s = staffMap[parts[2]];
+      addLog('メモ追加', `${parts[1]} ／ ${site?.name} ／ ${s?.name} → 「${txt.slice(0,30)}${txt.length>30?'…':''}」`);
+    }
+  } else {
+    if(memos[key]){
+      addLog('メモ削除', key);
+      delete memos[key];
+    }
+    el.innerText = '';
+  }
+}
+
+function escHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function dragOver(e){ if(!dragging) return; e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+
+// ===== SITE REORDER =====
+let dragSiteIdx = null;
+
+function siteRowDragStart(e, idx){
+  dragSiteIdx = idx;
+  // Find the parent site-row and mark it
+  const row = e.currentTarget.closest('.site-row');
+  if(row) setTimeout(()=>row.classList.add('drag-src'), 0);
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('site-reorder', idx);
+  // prevent staff drag from triggering
+  dragging = null;
+}
+
+function siteRowDragEnd(e){
+  dragSiteIdx = null;
+  document.querySelectorAll('.site-row').forEach(r=>{
+    r.classList.remove('drag-src','drag-over-top','drag-over-bot');
+  });
+}
+
+function siteRowOver(e, idx){
+  if(dragSiteIdx === null || dragSiteIdx === idx) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const row = e.currentTarget;
+  const mid = row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
+  document.querySelectorAll('.site-row').forEach(r=>r.classList.remove('drag-over-top','drag-over-bot'));
+  row.classList.add(e.clientY < mid ? 'drag-over-top' : 'drag-over-bot');
+}
+
+function siteRowLeave(e){
+  e.currentTarget.classList.remove('drag-over-top','drag-over-bot');
+}
+
+function siteRowDrop(e, targetIdx){
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.site-row').forEach(r=>r.classList.remove('drag-src','drag-over-top','drag-over-bot'));
+  if(dragSiteIdx === null || dragSiteIdx === targetIdx) return;
+  
+  const row = e.currentTarget;
+  const mid = row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
+  let insertAt = e.clientY < mid ? targetIdx : targetIdx + 1;
+  if(dragSiteIdx < insertAt) insertAt--;  // adjust for removal
+  
+  const [moved] = sites.splice(dragSiteIdx, 1);
+  sites.splice(insertAt, 0, moved);
+  dragSiteIdx = null;
+  renderWb();
+  toast(`「${moved.name}」を移動しました`, 'ok');
+}
+
+function drop(e, siteId, dateStr){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if(!dragging) return;
+  const s = dragging;
+  if(isOnLeave(s.id, dateStr)){
+    toast(`${s.name} は ${dateStr} に休みが登録されています`,'error'); return;
+  }
+  const k = aKey(siteId, dateStr);
+  if(!assignments[k]) assignments[k]=[];
+  if(assignments[k].includes(s.id)){ toast(`${s.name} はすでに配置済みです`,'warn'); return; }
+  assignments[k].push(s.id);
+  const site = sites.find(x=>x.id===siteId);
+  addLog('配置追加', `${dateStr} ／ ${site?.name||siteId} ← ${s.name}`);
+  render();
+  toast(`${s.name} を配置しました`,'ok');
+}
+
+function removeA(siteId, dateStr, staffId){
+  const k = aKey(siteId, dateStr);
+  assignments[k] = (assignments[k]||[]).filter(id=>id!==staffId);
+  delete okStatus[`${siteId}_${dateStr}_${staffId}`];
+  const site = sites.find(x=>x.id===siteId);
+  const s = staffMap[staffId];
+  addLog('配置削除', `${dateStr} ／ ${site?.name||siteId} → ${s?.name||staffId} を外した`);
+  render();
+}
+
+// OKステータス3段階サイクル: 未確認 → 黒OK(事前内諾) → 赤OK(前日確認) → 未確認
+function cycleOk(key){
+  const cur = okStatus[key] || '';
+  if(cur === '')       okStatus[key] = 'pre';
+  else if(cur==='pre') okStatus[key] = 'day';
+  else                 delete okStatus[key];
+  // keyは siteId_date_staffId
+  const [siteId, date, staffId] = key.split('_');
+  const s = staffMap[staffId];
+  const site = sites.find(x=>String(x.id)===siteId);
+  const newState = okStatus[key]||'未確認';
+  const stateLabel = newState==='pre'?'黒OK（事前内諾）':newState==='day'?'赤OK（前日確認済）':'未確認に戻す';
+  addLog('OK変更', `${date} ／ ${site?.name||siteId} ／ ${s?.name||staffId} → ${stateLabel}`);
+  renderWb();
+}
+
+function toggleCk(siteId){ checks[siteId]=!checks[siteId]; renderWb(); }
+
+// ===== MONTH NAV =====
+function chMonth(d){ curMonth+=d; if(curMonth>11){curMonth=0;curYear++;} if(curMonth<0){curMonth=11;curYear--;} render(); }
+
+// ===== RIGHT PANEL =====
+function renderRight(){
+  const today = toKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+  let th='';
+  sites.forEach(s=>{
+    const a = getAssigned(s.id, today);
+    const names = a.map(id=>staffMap[id]?.name).filter(Boolean);
+    th+=`<div class="ts"><div class="tsn">${s.name}</div><div class="tss ${names.length?'':'empty'}">${names.join('、')||'未配置'}</div></div>`;
+  });
+  document.getElementById('todayPanel').innerHTML = th||'<div style="font-size:11px;color:#999">データなし</div>';
+  
+  const days = daysIn(curYear, curMonth);
+  let total=0;
+  for(let d=1;d<=days;d++){
+    const ds = toKey(curYear,curMonth,d);
+    sites.forEach(s=>{ total+=getAssigned(s.id,ds).length; });
+  }
+  const lvThis = leaves.filter(l=>{
+    const lm = parseInt(l.start.slice(5,7))-1;
+    const ly = parseInt(l.start.slice(0,4));
+    return ly===curYear && lm===curMonth;
+  }).length;
+  
+  document.getElementById('statsPanel').innerHTML = `
+    <div class="str"><span class="stl">配置件数</span><span class="stv" style="color:var(--green)">${total}件</span></div>
+    <div class="str"><span class="stl">隊員総数</span><span class="stv">${staff.filter(s=>s.active).length}名</span></div>
+    <div class="str"><span class="stl">現場数</span><span class="stv">${sites.length}</span></div>
+    <div class="str"><span class="stl">今月休み</span><span class="stv" style="color:var(--orange)">${lvThis}件</span></div>
+  `;
+}
+
+// ===== MODALS =====
+function openMo(n){
+  if(n==='addLeave'){
+    const sel = document.getElementById('lv-staff');
+    sel.innerHTML = staff.map(s=>`<option value="${s.id}">${s.name}（${s.id}）</option>`).join('');
+    const t = new Date().toISOString().slice(0,10);
+    document.getElementById('lv-start').value = t;
+    document.getElementById('lv-end').value = t;
+  }
+  if(n==='leaveList') renderLeaveList();
+  if(n==='changelog') renderChangelog();
+  if(n==='setOperator'){
+    document.getElementById('operatorInput').value = currentOperator;
+  }
+  document.getElementById('mo-'+n).classList.add('open');
+}
+function closeMo(n){ document.getElementById('mo-'+n).classList.remove('open'); }
+document.querySelectorAll('.mo').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+
+function renderLeaveList(){
+  const el = document.getElementById('lvListContent');
+  if(!leaves.length){ el.innerHTML='<div style="font-size:12px;color:#999;text-align:center;padding:20px">登録なし</div>'; return; }
+  const sorted = [...leaves].sort((a,b)=>a.start.localeCompare(b.start));
+  el.innerHTML = sorted.map(l=>{
+    const s = staffMap[l.staffId];
+    return `<div style="display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid var(--wbl);font-size:11px">
+      <div class="av" style="background:${s?.color||'#999'};width:24px;height:24px;font-size:10px">${s?.name[0]||'?'}</div>
+      <div style="flex:1"><div style="font-weight:700">${s?.name||l.staffId}</div><div style="color:var(--ink3)">${l.start} 〜 ${l.end}</div></div>
+      <span style="background:#fff3cd;border-radius:4px;padding:2px 6px;font-size:10px">${l.reason}</span>
+      <button style="background:none;border:none;cursor:pointer;color:var(--red);font-size:14px" onclick="removeLeave('${l.staffId}','${l.start}','${l.end}');renderLeaveList()">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ===== CRUD =====
+function addStaff(){
+  const name = document.getElementById('ns-name').value.trim();
+  if(!name) return;
+  const id = String(nextStaffId++).padStart(6,'0');
+  const s = {
+    id, name, kana: document.getElementById('ns-kana').value.trim(),
+    birth: document.getElementById('ns-birth').value.replace(/-/g,'/'),
+    age: 0, sex: document.getElementById('ns-sex').value,
+    joinDate: document.getElementById('ns-join').value.replace(/-/g,'/'),
+    exp: parseInt(document.getElementById('ns-exp').value)||0,
+    tel: document.getElementById('ns-tel').value.trim(),
+    addr: document.getElementById('ns-addr').value.trim(),
+    color: COLORS[staff.length % COLORS.length], active:true
+  };
+  // Calc age
+  if(s.birth){ const b=new Date(s.birth.replace(/\//g,'-')); s.age=Math.floor((new Date()-b)/(1000*60*60*24*365)); }
+  staff.push(s);
+  staffMap[id] = s;
+  closeMo('addStaff');
+  ['ns-code','ns-name','ns-kana','ns-tel','ns-addr'].forEach(id=>document.getElementById(id).value='');
+  toast(`${name} を追加しました`,'ok');
+  render();
+}
+
+const DAY_NAMES_SHORT = ['日','月','火','水','木','金','土'];
+
+function buildDayBtns(containerId, selectedDays){
+  const wrap = document.getElementById(containerId);
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  DAY_NAMES_SHORT.forEach((name, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    const sunCls = i===0?' sun':i===6?' sat':'';
+    btn.className = 'day-btn' + sunCls + ((selectedDays||[]).includes(i) ? ' active' : '');
+    btn.textContent = name;
+    btn.dataset.day = i;
+    btn.onclick = () => btn.classList.toggle('active');
+    wrap.appendChild(btn);
+  });
+}
+
+function getSelectedDays(containerId){
+  return [...document.querySelectorAll(`#${containerId} .day-btn.active`)].map(b=>parseInt(b.dataset.day));
+}
+
+function toggleActiveDays(mode){
+  const pfx = mode==='add' ? '' : 'edit-';
+  const val = document.getElementById(`${pfx}site-contract`).value;
+  const adRow = document.getElementById(`${mode}-activedays-row`);
+  const trRow = document.getElementById(`${mode}-term-row`);
+  adRow.style.display = val==='regular' ? '' : 'none';
+  trRow.style.display = val==='term' ? '' : 'none';
+  if(val==='regular') buildDayBtns(`${mode}-day-btns`, [1,2,3,4,5]);
+}
+
+function addSite(){
+  const name = document.getElementById('site-name').value.trim();
+  if(!name) return;
+  const contract = document.getElementById('site-contract').value||'permanent';
+  const activeDays = contract==='regular'
+    ? getSelectedDays('add-day-btns')
+    : contract==='permanent' ? [0,1,2,3,4,5,6] : [];
+  sites.push({
+    id: nextSiteId++, name,
+    client:    document.getElementById('site-client').value.trim(),
+    time:      document.getElementById('site-time').value||'08:00～17:00',
+    need:      parseInt(document.getElementById('site-need').value)||1,
+    shift:     document.getElementById('site-shift').value||'day',
+    guard:     document.getElementById('site-guard').value||'1',
+    qual:      document.getElementById('site-qual').value||'general',
+    contract, activeDays, collapsed: false,
+    termStart: document.getElementById('site-term-start').value||'',
+    termEnd:   document.getElementById('site-term-end').value||'',
+  });
+  closeMo('addSite');
+  document.getElementById('site-name').value='';
+  document.getElementById('site-client').value='';
+  render();
+}
+
+function openEditSite(siteId){
+  const s = sites.find(x=>x.id===siteId);
+  if(!s) return;
+  document.getElementById('edit-site-id').value       = siteId;
+  document.getElementById('edit-site-client').value   = s.client||'';
+  document.getElementById('edit-site-name').value     = s.name;
+  document.getElementById('edit-site-time').value     = s.time;
+  document.getElementById('edit-site-need').value     = s.need;
+  document.getElementById('edit-site-shift').value    = s.shift||'day';
+  document.getElementById('edit-site-guard').value    = s.guard||'1';
+  document.getElementById('edit-site-qual').value     = s.qual||'general';
+  document.getElementById('edit-site-contract').value = s.contract||'permanent';
+  document.getElementById('edit-site-term-start').value = s.termStart||'';
+  document.getElementById('edit-site-term-end').value   = s.termEnd||'';
+  // 曜日ボタン生成
+  const adRow = document.getElementById('edit-activedays-row');
+  const trRow = document.getElementById('edit-term-row');
+  adRow.style.display = s.contract==='regular' ? '' : 'none';
+  trRow.style.display = s.contract==='term'    ? '' : 'none';
+  buildDayBtns('edit-day-btns', s.activeDays||[]);
+  document.getElementById('mo-editSite').classList.add('open');
+}
+
+function saveEditSite(){
+  const id = parseInt(document.getElementById('edit-site-id').value);
+  const s = sites.find(x=>x.id===id);
+  if(!s) return;
+  const newName = document.getElementById('edit-site-name').value.trim();
+  if(!newName) return;
+  s.client    = document.getElementById('edit-site-client').value.trim();
+  s.name      = newName;
+  s.time      = document.getElementById('edit-site-time').value.trim() || s.time;
+  s.need      = parseInt(document.getElementById('edit-site-need').value)||1;
+  s.shift     = document.getElementById('edit-site-shift').value||'day';
+  s.guard     = document.getElementById('edit-site-guard').value||'1';
+  s.qual      = document.getElementById('edit-site-qual').value||'general';
+  s.contract  = document.getElementById('edit-site-contract').value||'permanent';
+  s.termStart = document.getElementById('edit-site-term-start').value||'';
+  s.termEnd   = document.getElementById('edit-site-term-end').value||'';
+  s.activeDays = s.contract==='regular'
+    ? getSelectedDays('edit-day-btns')
+    : s.contract==='permanent' ? [0,1,2,3,4,5,6] : [];
+  closeMo('editSite');
+  toast(`「${s.name}」を更新しました`, 'ok');
+  render();
+}
+
+function deleteSite(siteId){
+  const s = sites.find(x=>x.id===siteId);
+  if(!s) return;
+  if(!confirm(`「${s.name}」を削除しますか？\nこの現場の配置データもすべて消えます。`)) return;
+  sites = sites.filter(x=>x.id!==siteId);
+  Object.keys(assignments).forEach(k=>{ if(k.startsWith(siteId+'_')) delete assignments[k]; });
+  delete checks[siteId];
+  toast(`「${s.name}」を削除しました`, 'ok');
+  render();
+}
+
+function deleteSiteFromModal(){
+  const id = parseInt(document.getElementById('edit-site-id').value);
+  closeMo('editSite');
+  deleteSite(id);
+}
+
+function addLeave(){
+  const staffId = document.getElementById('lv-staff').value;
+  const start = document.getElementById('lv-start').value;
+  const end = document.getElementById('lv-end').value;
+  const reason = document.getElementById('lv-reason').value;
+  if(!start||!end||start>end){ toast('日付を正しく入力してください','error'); return; }
+  
+  leaves.push({staffId, start, end, reason});
+  Object.keys(assignments).forEach(k=>{
+    const [,date]=k.split('_');
+    if(date>=start && date<=end)
+      assignments[k] = assignments[k].filter(id=>id!==staffId);
+  });
+  const s = staffMap[staffId];
+  addLog('休み登録', `${s?.name||staffId} ／ ${start}〜${end} （${reason}）`);
+  closeMo('addLeave');
+  toast(`${s?.name} の休みを登録しました（${reason}）`,'ok');
+  render();
+}
+
+// ===== Supabase クラウド同期 =====
+const SB_CONFIG_KEY = 'keibii_supabase_config';
+let _sbConfig = null;
+
+function sbLoadConfig(){
+  try {
+    const raw = localStorage.getItem(SB_CONFIG_KEY);
+    if(raw) _sbConfig = JSON.parse(raw);
+  } catch(e){}
+  if(_sbConfig?.url && _sbConfig?.key && _sbConfig?.dataid){
+    document.getElementById('sb-sync-btn').style.display = '';
+    document.getElementById('sb-url').value    = _sbConfig.url;
+    document.getElementById('sb-key').value    = _sbConfig.key;
+    document.getElementById('sb-dataid').value = _sbConfig.dataid;
+  }
+}
+
+function sbSaveConfig(){
+  const url    = document.getElementById('sb-url').value.trim().replace(/\/$/,'');
+  const key    = document.getElementById('sb-key').value.trim();
+  const dataid = document.getElementById('sb-dataid').value.trim() || 'default';
+  if(!url || !key){ toast('URLとkeyを入力してください','error'); return; }
+  _sbConfig = {url, key, dataid};
+  localStorage.setItem(SB_CONFIG_KEY, JSON.stringify(_sbConfig));
+  document.getElementById('sb-sync-btn').style.display = '';
+  closeMo('supabaseConfig');
+  toast('クラウド設定を保存しました。「☁️ 同期」ボタンで保存できます', 'ok');
+}
+
+async function sbTestConnection(){
+  const url    = document.getElementById('sb-url').value.trim().replace(/\/$/,'');
+  const key    = document.getElementById('sb-key').value.trim();
+  const dataid = document.getElementById('sb-dataid').value.trim() || 'default';
+  const el = document.getElementById('sb-status');
+  if(!url || !key){ el.textContent='❌ URLとkeyを入力してください'; el.style.color='#dc3545'; return; }
+  el.textContent = '接続確認中...'; el.style.color = '#888';
+  try {
+    const res = await fetch(`${url}/rest/v1/haichi?id=eq.${encodeURIComponent(dataid)}&select=id`, {
+      headers:{'apikey':key,'Authorization':`Bearer ${key}`}
+    });
+    const body = await res.text();
+    if(res.ok){
+      el.innerHTML = '✅ 接続成功！設定を保存してください。';
+      el.style.color = '#28a745';
+    } else if(res.status===401){
+      el.textContent = '❌ 認証エラー(401)：anon keyが間違っています。Settings→APIで再確認してください。';
+      el.style.color = '#dc3545';
+    } else if(res.status===404 || body.includes('does not exist') || body.includes('42P01')){
+      el.innerHTML = '❌ テーブルが存在しません。SQL Editorで CREATE TABLE を実行してください。<br><small style="color:#666">エラー：'+body.slice(0,120)+'</small>';
+      el.style.color = '#dc3545';
+    } else {
+      el.innerHTML = `❌ エラー(${res.status})：${body.slice(0,200)}`;
+      el.style.color = '#dc3545';
+    }
+  } catch(e){
+    el.textContent = '❌ 接続できません：URLを確認してください（' + e.message + '）';
+    el.style.color = '#dc3545';
+  }
+}
+
+async function supabasePush(silent=false){
+  if(!_sbConfig?.url){ if(!silent) toast('先に⚙️クラウド設定をしてください','error'); return; }
+  const {url, key, dataid} = _sbConfig;
+  const btn = document.getElementById('sb-sync-btn');
+  const timeEl = document.getElementById('ls-save-time');
+  if(!silent){ btn.textContent = '同期中...'; btn.disabled = true; }
+  try {
+    const payload = {
+      id: dataid,
+      data: { assignments, leaves, okStatus, cancels, memos, changeLogs: changeLogs.slice(0,200), sites,
+        addedStaff: staff.filter(s=>parseInt(s.id)>=2000),
+        staffQuals: staff.reduce((acc,s)=>{ if(s.qual&&s.qual!=='general') acc[s.id]=s.qual; return acc; },{}),
+        savedAt: new Date().toLocaleString('ja-JP'), savedBy: currentOperator||'（未設定）' },
+      updated_at: new Date().toISOString()
+    };
+    const bodyStr = JSON.stringify(payload);
+    const sizeMB = (new Blob([bodyStr]).size / 1024 / 1024).toFixed(2);
+
+    const res = await fetch(`${url}/rest/v1/haichi`, {
+      method: 'POST',
+      headers:{'apikey':key,'Authorization':`Bearer ${key}`,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body: bodyStr
+    });
+
+    if(res.ok || res.status===201 || res.status===200){
+      const now = new Date().toLocaleTimeString('ja-JP');
+      if(timeEl){ timeEl.textContent = `☁️ クラウド同期済 ${now}`; timeEl.style.color='#20c997'; }
+      if(!silent){
+        addLog('クラウド同期', `Supabase（${dataid}）に保存（${sizeMB}MB）`);
+        toast(`☁️ クラウドに保存しました（${sizeMB}MB）`, 'ok');
+      }
+    } else {
+      const t = await res.text();
+      let msg = '';
+      if(res.status===401) msg = '認証エラー：anon keyを確認してください';
+      else if(res.status===403) msg = '権限エラー：SQL Editorで「ALTER TABLE haichi DISABLE ROW LEVEL SECURITY;」を実行してください';
+      else if(t.includes('42P01') || t.includes('does not exist')) msg = 'テーブルが存在しません：SQL Editorで CREATE TABLE を実行してください';
+      else if(t.includes('413') || t.includes('too large')) msg = `データが大きすぎます（${sizeMB}MB）`;
+      else msg = `(${res.status}) ${t.slice(0,150)}`;
+      if(timeEl){ timeEl.textContent = '⚠️ 同期失敗'; timeEl.style.color='#dc3545'; }
+      if(!silent) sbShowError(msg, t);
+      else toast('自動同期失敗：☁️ 同期ボタンで詳細確認', 'error');
+    }
+  } catch(e){
+    if(timeEl){ timeEl.textContent = '⚠️ 同期失敗（接続エラー）'; timeEl.style.color='#dc3545'; }
+    if(!silent) sbShowError('ネットワーク接続エラー', e.message);
+  } finally {
+    if(!silent){ btn.textContent = '☁️ 同期'; btn.disabled = false; }
+  }
+}
+
+function sbShowError(shortMsg, detail){
+  const existing = document.getElementById('sb-error-modal');
+  if(existing) existing.remove();
+  const div = document.createElement('div');
+  div.id = 'sb-error-modal';
+  div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center';
+  div.innerHTML = `<div style="background:#fff;border-radius:14px;padding:22px;width:460px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="font-size:15px;font-weight:700;color:#dc3545;margin-bottom:12px">⚠️ 同期失敗</div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#333">${shortMsg}</div>
+    <div style="font-size:11px;color:#666;background:#f5f5f5;border-radius:6px;padding:8px 10px;word-break:break-all;margin-bottom:14px;max-height:120px;overflow-y:auto">${detail||'詳細なし'}</div>
+    <div style="font-size:12px;color:#1b5e20;background:#e8f5e9;border-radius:6px;padding:8px 10px;margin-bottom:14px">
+      💡 よくある解決策：<br>
+      1. Supabase → SQL Editor → <code>ALTER TABLE haichi DISABLE ROW LEVEL SECURITY;</code> を実行<br>
+      2. anon keyが正しいか「⚙️ クラウド → 接続テスト」で確認<br>
+      3. テーブルがなければ CREATE TABLE も実行
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button onclick="openMo('supabaseConfig');document.getElementById('sb-error-modal').remove()"
+        style="border:1.5px solid #0071e3;background:#fff;color:#0071e3;border-radius:7px;padding:7px 14px;cursor:pointer;font-weight:700;font-family:inherit">⚙️ 設定を開く</button>
+      <button onclick="document.getElementById('sb-error-modal').remove()"
+        style="background:#dc3545;color:#fff;border:none;border-radius:7px;padding:7px 14px;cursor:pointer;font-weight:700;font-family:inherit">閉じる</button>
+    </div>
+  </div>`;
+  document.body.appendChild(div);
+}
+
+async function supabasePull(){
+  if(!_sbConfig?.url) return false;
+  const {url, key, dataid} = _sbConfig;
+  try {
+    const res = await fetch(`${url}/rest/v1/haichi?id=eq.${encodeURIComponent(dataid)}&select=data`, {
+      headers:{'apikey':key,'Authorization':`Bearer ${key}`}
+    });
+    if(!res.ok) return false;
+    const rows = await res.json();
+    if(!rows.length) return false;
+    const data = rows[0].data;
+    if(data.assignments) assignments = data.assignments;
+    if(data.leaves)      leaves      = data.leaves;
+    if(data.okStatus)    okStatus    = data.okStatus;
+    if(data.cancels)     cancels     = data.cancels;
+    if(data.memos)       memos       = data.memos;
+    if(data.changeLogs)  changeLogs  = data.changeLogs;
+    if(data.sites)       sites       = data.sites;
+    if(data.addedStaff)  data.addedStaff.forEach(s=>{ if(!staffMap[s.id]){ staff.push(s); staffMap[s.id]=s; } });
+    if(data.staffQuals)  Object.entries(data.staffQuals).forEach(([id,q])=>{ if(staffMap[id]) staffMap[id].qual=q; });
+    return data.savedAt || true;
+  } catch(e){ return false; }
+}
+
+// ===== localStorage 自動保存・復元 =====
+const LS_KEY = 'keibii_haichi_v1';
+
+function autoSave(){
+  try {
+    const data = {
+      assignments, leaves, okStatus, cancels, memos, changeLogs, sites,
+      addedStaff: staff.filter(s => parseInt(s.id) >= 2000),
+      staffQuals: staff.reduce((acc,s)=>{ if(s.qual && s.qual!=='general') acc[s.id]=s.qual; return acc; }, {}),
+      savedAt: new Date().toLocaleString('ja-JP')
+    };
+    const json = JSON.stringify(data);
+    localStorage.setItem(LS_KEY, json);
+    // 保存済み表示を更新
+    const el = document.getElementById('ls-save-time');
+    if(el) el.textContent = '💾 自動保存済 ' + new Date().toLocaleTimeString('ja-JP');
+  } catch(e){
+    console.warn('autoSave failed', e);
+    // localStorageが使えない場合（file://など）は警告
+    const el = document.getElementById('ls-save-time');
+    if(el){ el.textContent = '⚠️ 自動保存できません（下記参照）'; el.style.color='#dc3545'; }
+  }
+}
+
+function autoLoad(){
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    if(data.assignments) assignments = data.assignments;
+    if(data.leaves)      leaves      = data.leaves;
+    if(data.okStatus)    okStatus    = data.okStatus;
+    if(data.cancels)     cancels     = data.cancels;
+    if(data.memos)       memos       = data.memos;
+    if(data.changeLogs)  changeLogs  = data.changeLogs;
+    if(data.sites)       sites       = data.sites;
+    if(data.addedStaff)  data.addedStaff.forEach(s=>{ if(!staffMap[s.id]){ staff.push(s); staffMap[s.id]=s; } });
+    if(data.staffQuals)  Object.entries(data.staffQuals).forEach(([id,q])=>{ if(staffMap[id]) staffMap[id].qual=q; });
+    return true;
+  } catch(e){ console.warn('autoLoad failed', e); return false; }
+}
+function toast(msg, type='ok'){
+  const c = type==='ok'?'#28a745':type==='error'?'#dc3545':'#fd7e14';
+  const t = document.createElement('div');
+  t.style.cssText=`position:fixed;bottom:20px;right:20px;background:${c};color:#fff;padding:9px 16px;border-radius:9px;font-size:12px;font-weight:700;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.15);animation:fadeUp .2s`;
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2500);
+}
+
+// ===== 担当者設定 =====
+function setOperator(){
+  const name = document.getElementById('operatorInput').value.trim();
+  if(!name) return;
+  currentOperator = name;
+  localStorage.setItem('operator', name);
+  document.getElementById('operatorDisp').textContent = name;
+  closeMo('setOperator');
+  addLog('担当者変更', `${name} がログイン`);
+  toast(`担当者を「${name}」に設定しました`, 'ok');
+}
+
+// ===== 保存（JSONダウンロード） =====
+function saveData(){
+  const data = {
+    savedAt: new Date().toLocaleString('ja-JP'),
+    savedBy: currentOperator || '（未設定）',
+    assignments, leaves, okStatus, cancels, memos, changeLogs, sites,
+    // 追加スタッフのみ保存（元データは組み込み済み）
+    addedStaff: staff.filter(s => parseInt(s.id) >= 2000)
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const d = new Date();
+  a.download = `配置表_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_${(currentOperator||'data').replace(/\s/g,'')}.json`;
+  a.click();
+  addLog('保存', `JSONファイルをダウンロード`);
+  toast('保存しました（ダウンロードフォルダを確認）', 'ok');
+}
+
+// ===== 読込（JSONアップロード） =====
+function loadData(){
+  document.getElementById('fileInput').click();
+}
+
+function onFileLoad(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if(data.assignments) assignments = data.assignments;
+      if(data.leaves) leaves = data.leaves;
+      if(data.okStatus) okStatus = data.okStatus;
+      if(data.sites) sites = data.sites;
+      if(data.changeLogs) changeLogs = data.changeLogs;
+      if(data.cancels)    cancels    = data.cancels;
+      if(data.memos)      memos      = data.memos;
+      if(data.addedStaff) {
+        data.addedStaff.forEach(s => {
+          if(!staffMap[s.id]){ staff.push(s); staffMap[s.id]=s; }
+        });
+      }
+      if(data.staffQuals) Object.entries(data.staffQuals).forEach(([id,q])=>{ if(staffMap[id]) staffMap[id].qual=q; });
+      addLog('読込', `${data.savedBy||'不明'}が${data.savedAt||''}に保存したファイルを読み込み`);
+      render(); // render内でautoSaveも呼ばれる
+      toast(`「${file.name}」を読み込みました`, 'ok');
+    } catch(err) {
+      toast('ファイルの読み込みに失敗しました', 'error');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ===== 変更履歴 =====
+function renderChangelog(){
+  const el = document.getElementById('changelogContent');
+  if(!changeLogs.length){
+    el.innerHTML = '<div style="text-align:center;color:#999;padding:24px;font-size:12px">変更履歴はまだありません</div>';
+    return;
+  }
+  const actionColor = {
+    '配置追加':'#28a745','配置削除':'#dc3545',
+    'OK変更':'#0071e3','休み登録':'#fd7e14',
+    '現場中止':'#c0392b','隊員中止':'#e74c3c',
+    '中止解除':'#888','隊員中止解除':'#888',
+    'メモ更新':'#f39c12','メモ削除':'#95a5a6',
+    'AI登録':'#6f42c1','AI休み登録':'#20c997',
+    '読込':'#6f42c1','保存':'#20c997','担当者変更':'#607d8b'
+  };
+  el.innerHTML = changeLogs.map(l => {
+    const col = actionColor[l.action] || '#888';
+    return `<div style="display:grid;grid-template-columns:140px 72px 1fr;gap:8px;align-items:center;padding:7px 4px;border-bottom:1px solid var(--wbl)">
+      <span style="color:var(--ink3);font-size:10px">${l.ts}</span>
+      <span style="background:${col}18;color:${col};border:1px solid ${col}40;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;text-align:center;white-space:nowrap">${l.action}</span>
+      <span style="color:var(--ink)"><span style="color:var(--ink3)">${l.operator}</span>　${l.detail}</span>
+    </div>`;
+  }).join('');
+}
+
+// ===== RENDER =====
+let _syncTimer = null;
+
+function render(){
+  const m=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  document.getElementById('mdisp').textContent=`${curYear}年 ${m[curMonth]}`;
+  renderSb();
+  renderWb();
+  renderRight();
+  autoSave(); // localStorageに即時保存
+
+  // Supabase設定があれば3秒後に自動同期（連続操作は最後の1回だけ送信）
+  if(_sbConfig?.url){
+    clearTimeout(_syncTimer);
+    const el = document.getElementById('ls-save-time');
+    if(el){ el.textContent = '☁️ 同期待機中...'; el.style.color='#888'; }
+    _syncTimer = setTimeout(async ()=>{
+      await supabasePush(true); // true = サイレントモード（成功トーストなし）
+    }, 3000);
+  }
+}
+
+// 担当者名を表示
+if(currentOperator) document.getElementById('operatorDisp').textContent = currentOperator;
+
+// file:// で開いている場合の警告
+if(location.protocol === 'file:'){
+  document.getElementById('file-warning').style.display = 'block';
+}
+
+// タブを閉じる直前にも保存（念のため二重保護）
+window.addEventListener('beforeunload', () => { autoSave(); });
+
+// Supabase設定を読み込む
+sbLoadConfig();
+
+// 起動時: Supabase優先 → localStorage フォールバック
+(async () => {
+  if(_sbConfig?.url){
+    const savedAt = await supabasePull();
+    if(savedAt){
+      render();
+      toast(`☁️ クラウドから復元しました（${savedAt}）`, 'ok');
+      return;
+    }
+  }
+  const restored = autoLoad();
+  render();
+  if(restored) toast('前回のデータを自動復元しました', 'ok');
+})();
+</script>
+</body>
+</html>
